@@ -1,0 +1,148 @@
+%define with_db 0
+%define sbindir	/sbin
+
+Summary: Enhanced system logging and kernel message trapping daemons
+Name: rsyslog
+Version: 1.17.0
+Release: 1%{?dist}
+License: GPL
+Group: System Environment/Daemons
+URL: http://www.rsyslog.com/
+Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
+Source1: rsyslog.init
+Patch1: rsyslog-1.17.0-cleanup.patch
+Conflicts: logrotate < 3.5.2
+%if %{with_db}
+BuildRequires: mysql-devel >= 4.0
+%endif
+BuildRequires: zlib-devel
+BuildRequires: autoconf, automake
+Requires: logrotate
+Requires: bash >= 2.0
+Requires(post): /sbin/chkconfig coreutils
+Requires(preun): /sbin/chkconfig /sbin/chkconfig
+Requires(postun): /sbin/service
+Provides: syslog
+Obsoletes: sysklogd
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+%description
+Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
+syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
+and fine grain output format control. It is quite compatible to stock sysklogd
+and can be used as a drop-in replacement. Its advanced features make it 
+suitable for enterprise-class, encryption protected syslog relay chains while 
+at the same time being very easy to setup for the novice user.
+
+
+%prep
+%setup -q
+%patch1 -p1 -b .cleanup
+
+autoreconf
+
+%build
+%configure --sbindir=%{sbindir}
+make %{?_smp_mflags}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+make install DESTDIR=$RPM_BUILD_ROOT
+
+install -d -m 755 $RPM_BUILD_ROOT%{_initrddir}
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
+install -p -m 644 redhat/rsyslog.conf $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
+install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/rsyslog
+install -p -m 644 redhat/rsyslog.sysconfig $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pretrans
+#use sysklogd configuration file
+[ -f /etc/syslog.conf ] && cp -a /etc/syslog.conf /etc/rsyslog.conf >/dev/null 2>&1 ||:
+[ -f /etc/sysconfig/syslog ] && cp -a /etc/sysconfig/syslog /etc/sysconfig/rsyslog >/dev/null 2>&1 ||:
+
+%post
+if [ $1 = 1 ]; then
+	/sbin/chkconfig --add rsyslog
+fi
+for n in /var/log/{messages,secure,maillog,spooler}
+do
+        [ -f $n ] && continue
+        umask 066 && touch $n
+done
+
+%preun
+if [ $1 = 0 ]; then
+	service rsyslog stop >/dev/null 2>&1 ||:
+	/sbin/chkconfig --del rsyslog
+fi
+
+%postun
+if [ "$1" -ge "1" ]; then
+	service rsyslog condrestart > /dev/null 2>&1 ||:
+fi	
+
+%files
+%defattr(-,root,root,-)
+%doc AUTHORS COPYING INSTALL NEWS README
+%config(noreplace) %{_sysconfdir}/rsyslog.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
+%{_initrddir}/rsyslog
+%{sbindir}/rsyslogd
+%{sbindir}/rklogd
+%{sbindir}/rfc3195d
+%{_mandir}/*/*
+
+%changelog
+* Thu Jul 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.0-1
+- feature rich upstream release
+
+* Thu Jul 12 2007 Peter Vrabec <pvrabec@redhat.com> 1.15.1-2
+- use obsoletes and hadle old config files
+
+* Wed Jul 11 2007 Peter Vrabec <pvrabec@redhat.com> 1.15.1-1
+- new upstream bugfix release
+
+* Tue Jul 10 2007 Peter Vrabec <pvrabec@redhat.com> 1.15.0-1
+- new upstream release introduce capability to generate output 
+  file names based on templates
+
+* Tue Jul 03 2007 Peter Vrabec <pvrabec@redhat.com> 1.14.2-1
+- new upstream bugfix release
+
+* Mon Jul 02 2007 Peter Vrabec <pvrabec@redhat.com> 1.14.1-1
+- new upstream release with IPv6 support
+
+* Tue Jun 26 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.5-3
+- add BuildRequires for  zlib compression feature
+
+* Mon Jun 25 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.5-2
+- some spec file adjustments.
+- fix syslog init script error codes (#245330)
+
+* Fri Jun 22 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.5-1
+- new upstream release
+
+* Fri Jun 22 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.4-2
+- some spec file adjustments.
+
+* Mon Jun 18 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.4-1
+- upgrade to new upstream release
+
+* Wed Jun 13 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.2-2
+- DB support off
+
+* Tue Jun 12 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.2-1
+- new upstream release based on redhat patch
+
+* Fri Jun 08 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.1-2
+- rsyslog package provides its own kernel log. daemon (rklogd)
+
+* Mon Jun 04 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.1-1
+- Initial rpm build
