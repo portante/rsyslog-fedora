@@ -1,0 +1,18 @@
+--- rsyslog-1.17.1/syslogd.c.rOptionCompat	2007-07-20 10:22:56.000000000 +0200
++++ rsyslog-1.17.1/syslogd.c	2007-07-20 12:34:02.000000000 +0200
+@@ -9174,7 +9174,14 @@
+ 		case 'x':		/* disable dns for remote messages */
+ 			DisableDNS = 1;
+ 			break;
+-		case '?':
++		case '?':              
++			/* handle "-r" option for compatibility reasons */
++	                if(optopt == 'r') {
++				opterr = 0;
++		                AcceptRemote = 1;
++				LogPort = "0";
++				break;
++			}
+ 		default:
+ 			usage();
+ 		}

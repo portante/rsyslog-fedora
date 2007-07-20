@@ -3,14 +3,15 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.17.0
+Version: 1.17.1
 Release: 1%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
-Patch1: rsyslog-1.17.0-cleanup.patch
+Source2: rsyslog.sysconfig
+Patch1: rsyslog-1.17.1-rOptionCompat.patch
 Conflicts: logrotate < 3.5.2
 %if %{with_db}
 BuildRequires: mysql-devel >= 4.0
@@ -37,9 +38,7 @@ at the same time being very easy to setup for the novice user.
 
 %prep
 %setup -q
-%patch1 -p1 -b .cleanup
-
-autoreconf
+%patch1 -p1 -b .rOptionCompat
 
 %build
 %configure --sbindir=%{sbindir}
@@ -56,7 +55,7 @@ install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
 install -p -m 644 redhat/rsyslog.conf $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
 install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/rsyslog
-install -p -m 644 redhat/rsyslog.sysconfig $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -89,7 +88,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING INSTALL NEWS README
+%doc AUTHORS COPYING INSTALL NEWS README doc
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
@@ -100,7 +99,12 @@ fi
 %{_mandir}/*/*
 
 %changelog
-* Thu Jul 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.0-1
+* Fri Jul 20 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.1-1
+- upstream bug fix release
+- include html docs (#248712)
+- make "-r" option compatible with sysklogd config (248982)
+
+* Tue Jul 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.0-1
 - feature rich upstream release
 
 * Thu Jul 12 2007 Peter Vrabec <pvrabec@redhat.com> 1.15.1-2
