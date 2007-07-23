@@ -1,9 +1,9 @@
-%define with_db 0
-%define sbindir	/sbin
+%define	with_db	0
+%define	sbindir	/sbin
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.17.1
+Version: 1.17.2
 Release: 1%{?dist}
 License: GPL
 Group: System Environment/Daemons
@@ -11,7 +11,6 @@ URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
-Patch1: rsyslog-1.17.1-rOptionCompat.patch
 Conflicts: logrotate < 3.5.2
 %if %{with_db}
 BuildRequires: mysql-devel >= 4.0
@@ -24,6 +23,7 @@ Requires(post): /sbin/chkconfig coreutils
 Requires(preun): /sbin/chkconfig /sbin/chkconfig
 Requires(postun): /sbin/service
 Provides: syslog
+Provides: sysklogd
 Obsoletes: sysklogd
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -38,7 +38,6 @@ at the same time being very easy to setup for the novice user.
 
 %prep
 %setup -q
-%patch1 -p1 -b .rOptionCompat
 
 %build
 %configure --sbindir=%{sbindir}
@@ -71,8 +70,8 @@ if [ $1 = 1 ]; then
 fi
 for n in /var/log/{messages,secure,maillog,spooler}
 do
-        [ -f $n ] && continue
-        umask 066 && touch $n
+	[ -f $n ] && continue
+	umask 066 && touch $n
 done
 
 %preun
@@ -99,6 +98,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Mon Jul 23 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-1
+- upstream bug fix release
+
 * Fri Jul 20 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.1-1
 - upstream bug fix release
 - include html docs (#248712)
