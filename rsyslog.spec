@@ -1,10 +1,10 @@
-%define	with_db	0
+%define with_db 0
 %define	sbindir	/sbin
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 1.17.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -24,7 +24,7 @@ Requires(preun): /sbin/chkconfig /sbin/chkconfig
 Requires(postun): /sbin/service
 Provides: syslog
 Provides: sysklogd = 1.4.2.11
-Obsoletes: sysklogd <= 1.4.2-10
+Obsoletes: sysklogd < 1.4.2-11
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -59,11 +59,6 @@ install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%pretrans
-#use sysklogd configuration file
-[ -f /etc/syslog.conf ] && cp -a /etc/syslog.conf /etc/rsyslog.conf >/dev/null 2>&1 ||:
-[ -f /etc/sysconfig/syslog ] && cp -a /etc/sysconfig/syslog /etc/sysconfig/rsyslog >/dev/null 2>&1 ||:
-
 %post
 if [ $1 = 1 ]; then
 	/sbin/chkconfig --add rsyslog
@@ -73,6 +68,15 @@ do
 	[ -f $n ] && continue
 	umask 066 && touch $n
 done
+#use sysklogd configuration files
+if [ -f /etc/syslog.conf ]; then
+	mv -f /etc/rsyslog.conf /etc/rsyslog.conf.rpmnew
+	mv -f /etc/syslog.conf  /etc/rsyslog.conf
+fi
+if [ -f /etc/sysconfig/syslog ]; then
+	mv -f /etc/sysconfig/rsyslog /etc/sysconfig/rsyslog.rpmnew
+	mv -f /etc/sysconfig/syslog  /etc/sysconfig/rsyslog
+fi
 
 %preun
 if [ $1 = 0 ]; then
@@ -98,6 +102,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Jul 24 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-3
+- take care of sysklogd configuration files in %%post
+
 * Tue Jul 24 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-2
 - use EVR in provides/obsoletes sysklogd
 
