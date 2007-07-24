@@ -4,7 +4,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 1.17.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -23,8 +23,8 @@ Requires(post): /sbin/chkconfig coreutils
 Requires(preun): /sbin/chkconfig /sbin/chkconfig
 Requires(postun): /sbin/service
 Provides: syslog
-Provides: sysklogd
-Obsoletes: sysklogd
+Provides: sysklogd = 1.4.2.11
+Obsoletes: sysklogd <= 1.4.2-10
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -98,6 +98,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Jul 24 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-2
+- use EVR in provides/obsoletes sysklogd
+
 * Mon Jul 23 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-1
 - upstream bug fix release
 
