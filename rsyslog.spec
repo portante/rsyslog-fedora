@@ -4,7 +4,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 1.17.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -102,6 +102,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Wed Jul 25 2007 Jeremy Katz <katzj@redhat.com> - 1.17.2-4
+- rebuild for toolchain bug
+
 * Tue Jul 24 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.2-3
 - take care of sysklogd configuration files in %%post
 
