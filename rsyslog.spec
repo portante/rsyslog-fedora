@@ -3,8 +3,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.17.2
-Release: 4%{?dist}
+Version: 1.17.5
+Release: 1%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -16,15 +16,14 @@ Conflicts: logrotate < 3.5.2
 BuildRequires: mysql-devel >= 4.0
 %endif
 BuildRequires: zlib-devel
-BuildRequires: autoconf, automake
 Requires: logrotate
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
 Requires(preun): /sbin/chkconfig /sbin/chkconfig
 Requires(postun): /sbin/service
 Provides: syslog
-Provides: sysklogd = 1.4.2.11
-Obsoletes: sysklogd < 1.4.2-11
+Provides: sysklogd = 1.4.3-1
+Obsoletes: sysklogd < 1.4.3-1
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -102,6 +101,10 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Mon Jul 30 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.5-1
+- upstream bugfix release
+- fix typo in provides 
+
 * Wed Jul 25 2007 Jeremy Katz <katzj@redhat.com> - 1.17.2-4
 - rebuild for toolchain bug
 
