@@ -3,7 +3,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.17.6
+Version: 1.18.0
 Release: 1%{?dist}
 License: GPL
 Group: System Environment/Daemons
@@ -101,6 +101,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Mon Aug 06 2007 Peter Vrabec <pvrabec@redhat.com> 1.18.0-1
+- new upstream release
+
 * Thu Aug 02 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.6-1
 - upstream bugfix release
 
