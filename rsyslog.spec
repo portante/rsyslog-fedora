@@ -1,20 +1,20 @@
-%define with_db 0
 %define	sbindir	/sbin
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.18.1
+Version: 1.19.0
 Release: 1%{?dist}
-License: GPL
+License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
+Patch1: rsyslog-1.19.0-libPath.patch
+Patch2: rsyslog-1.19.0-ommysqlLeak.patch
+Patch3: rsyslog-1.19.0-modUnload.patch
+Patch4: rsyslog-1.19.0-readfds.patch
 Conflicts: logrotate < 3.5.2
-%if %{with_db}
-BuildRequires: mysql-devel >= 4.0
-%endif
 BuildRequires: zlib-devel
 Requires: logrotate
 Requires: bash >= 2.0
@@ -26,6 +26,12 @@ Provides: sysklogd = 1.4.3-1
 Obsoletes: sysklogd < 1.4.3-1
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+%package mysql
+Summary: MySQL support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: mysql-devel >= 4.0
+
 %description
 Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
 syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
@@ -35,11 +41,20 @@ suitable for enterprise-class, encryption protected syslog relay chains while
 at the same time being very easy to setup for the novice user.
 
 
+%description mysql
+The rsyslog-mysql package contains a dynamic shared object that will add
+MySQL database support to rsyslog.
+
 %prep
 %setup -q
+%patch1 -p1 -b .libPath
+%patch2 -p1 -b .ommysqlLeak
+%patch3 -p1 -b .modUnload
+%patch4 -p1 -b .readfds
+autoreconf
 
 %build
-%configure --sbindir=%{sbindir}
+%configure --sbindir=%{sbindir} --disable-static
 make %{?_smp_mflags}
 
 %install
@@ -54,6 +69,9 @@ install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
 install -p -m 644 redhat/rsyslog.conf $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
 install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/rsyslog
 install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
+
+#get rid of *.la
+rm $RPM_BUILD_ROOT/%{_libdir}/rsyslog/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -100,7 +118,15 @@ fi
 %{sbindir}/rfc3195d
 %{_mandir}/*/*
 
+%files mysql
+%defattr(-,root,root)
+%doc createDB.sql
+%{_libdir}/rsyslog/ommysql.so
+
 %changelog
+* Fri Aug 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.0-1
+- new upstream release with MySQL support(as plugin)
+
 * Wed Aug 08 2007 Peter Vrabec <pvrabec@redhat.com> 1.18.1-1
 - upstream bugfix release
 
