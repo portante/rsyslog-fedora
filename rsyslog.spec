@@ -16,6 +16,7 @@ Patch3: rsyslog-1.19.0-modUnload.patch
 Patch4: rsyslog-1.19.0-readfds.patch
 Conflicts: logrotate < 3.5.2
 BuildRequires: zlib-devel
+BuildRequires: autoconf, automake, libtool
 Requires: logrotate
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
