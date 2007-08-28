@@ -1,0 +1,25 @@
+--- rsyslog/syslogd.c.orig	2007-08-28 11:41:08.000000000 +0200
++++ rsyslog/syslogd.c	2007-08-28 12:35:55.000000000 +0200
+@@ -2302,8 +2302,20 @@ int shouldProcessThisMessage(selector_t 
+ 	}
+ 	
+ 	if(f->pCSProgNameComp != NULL) {
+-		if(rsCStrSzStrCmp(f->pCSProgNameComp, (uchar*) getProgramName(pMsg), getProgramNameLen(pMsg))) {
+-			/* not equal, so we are already done... */
++		int bInv = 0, bEqv = 0, offset = 0;
++		if(*(rsCStrGetSzStr(f->pCSProgNameComp)) == '-') {
++			if(*(rsCStrGetSzStr(f->pCSProgNameComp) + 1) == '-')
++				offset = 1;
++			else {
++				bInv = 1;
++				offset = 1;
++			}
++		}
++		if(!rsCStrOffsetSzStrCmp(f->pCSProgNameComp, offset, (uchar*) getProgramName(pMsg), getProgramNameLen(pMsg)))
++			bEqv = 1;
++
++		if((!bEqv && !bInv) || (bEqv && bInv)) {
++			/* not equal or inverted selection, so we are already done... */
+ 			dbgprintf("programname filter '%s' does not match '%s'\n", 
+ 				rsCStrGetSzStr(f->pCSProgNameComp), getProgramName(pMsg));
+ 			return 0;

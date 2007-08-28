@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.19.0
+Version: 1.19.2
 Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
@@ -10,13 +10,11 @@ URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
-Patch1: rsyslog-1.19.0-libPath.patch
-Patch2: rsyslog-1.19.0-ommysqlLeak.patch
-Patch3: rsyslog-1.19.0-modUnload.patch
-Patch4: rsyslog-1.19.0-readfds.patch
+Patch1: rsyslog-1.19.2-invertAppSelect.patch
 Conflicts: logrotate < 3.5.2
 BuildRequires: zlib-devel
-BuildRequires: autoconf, automake, libtool
+BuildRequires: autoconf automake
+Requires: logrotate
 Requires: logrotate
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
@@ -48,11 +46,7 @@ MySQL database support to rsyslog.
 
 %prep
 %setup -q
-%patch1 -p1 -b .libPath
-%patch2 -p1 -b .ommysqlLeak
-%patch3 -p1 -b .modUnload
-%patch4 -p1 -b .readfds
-autoreconf
+%patch1 -p1 -b .invertAppSelect
 
 %build
 %configure --sbindir=%{sbindir} --disable-static
@@ -125,6 +119,11 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Tue Aug 28 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.2-1
+- upstream bugfix release
+- support for negative app selector, patch from 
+  theinric@redhat.com
+
 * Fri Aug 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.0-1
 - new upstream release with MySQL support(as plugin)
 
