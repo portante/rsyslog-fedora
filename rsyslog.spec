@@ -3,13 +3,14 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 1.19.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
+Patch1: rsyslog-1.19.6-repmsg.patch
 Conflicts: logrotate < 3.5.2
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
@@ -45,6 +46,7 @@ MySQL database support to rsyslog.
 
 %prep
 %setup -q
+%patch1 -p1 -b .repmsg
 
 %build
 %configure --sbindir=%{sbindir} --disable-static
@@ -117,7 +119,10 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
-* Tue Sep 25 2007 Tomas Heinrich <theinric@redhat.com> 1.19.6
+* Tue Sep 25 2007 Tomas Heinrich <theinric@redhat.com> 1.19.6-2
+- fix message suppression (303341)
+
+* Tue Sep 25 2007 Tomas Heinrich <theinric@redhat.com> 1.19.6-1
 - upstream bugfix release
 
 * Tue Aug 28 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.2-1

@@ -1,3 +1,4 @@
 fe8fcd90c672701fa198dd1206df64ae  rsyslog.init
 e10d2dc3238c2cf2a54933f10b19b9bf  rsyslog.sysconfig
 0aa4ea5d07d3c2ba3080b4a64280ff72  rsyslog-1.19.6.tar.gz
+8687f4cb4dbc28106890a00eabf2c6f7  rsyslog-1.19.6-repmsg.patch

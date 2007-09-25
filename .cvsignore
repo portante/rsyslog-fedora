@@ -1,3 +1,4 @@
 rsyslog.init
 rsyslog.sysconfig
 rsyslog-1.19.6.tar.gz
+rsyslog-1.19.6-repmsg.patch
