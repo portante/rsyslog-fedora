@@ -1,0 +1,22 @@
+--- syslogd.c.dropNul	2007-10-03 17:38:07.000000000 +0200
++++ syslogd.c	2007-10-03 17:43:23.000000000 +0200
+@@ -2023,13 +2023,18 @@ void printchopped(char *hname, char *msg
+ 
+ 	dbgprintf("Message length: %d, File descriptor: %d.\n", len, fd);
+ 
++	if(*(msg + len - 1) == '\0') {
++		dbgprintf("dropped NUL at very end of message\n");
++		len--;
++	}
++
+ 	/* we first check if we need to drop trailing LFs, which often make
+ 	 * their way into syslog messages unintentionally. In order to remain
+ 	 * compatible to recent IETF developments, we allow the user to
+ 	 * turn on/off this handling.  rgerhards, 2007-07-23
+ 	 */
+ 	if(bDropTrailingLF && *(msg + len - 1) == '\n') {
+-		*(msg + len - 1) = '\0';
++		dbgprintf("dropped LF at very end of message (DropTrailingLF is set)\n");
+ 		len--;
+ 	}
+ 
