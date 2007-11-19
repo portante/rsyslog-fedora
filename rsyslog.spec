@@ -2,16 +2,14 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.19.6
-Release: 3%{?dist}
+Version: 1.19.10
+Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
-Patch1: rsyslog-1.19.6-repmsg.patch
-Patch2: rsyslog-1.19.6-dropNul.patch 
 Conflicts: logrotate < 3.5.2
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
@@ -47,11 +45,9 @@ MySQL database support to rsyslog.
 
 %prep
 %setup -q
-%patch1 -p1 -b .repmsg
-%patch2 -p0 -b .dropnul
 
 %build
-%configure --sbindir=%{sbindir} --disable-static
+%configure --sbindir=%{sbindir} --disable-static --enable-mysql
 make %{?_smp_mflags}
 
 %install
@@ -121,6 +117,9 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Mon Nov 19 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.10-1
+- new upstream release
+
 * Wed Oct 03 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.6-3
 - remove NUL character from recieved messages
 
