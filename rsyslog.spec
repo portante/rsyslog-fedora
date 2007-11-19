@@ -113,7 +113,7 @@ fi
 
 %files mysql
 %defattr(-,root,root)
-%doc createDB.sql
+%doc plugins/ommysql/createDB.sql
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
