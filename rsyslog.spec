@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.19.10
+Version: 1.19.11
 Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
@@ -22,6 +22,7 @@ Requires(postun): /sbin/service
 Provides: syslog
 Provides: sysklogd = 1.4.3-1
 Obsoletes: sysklogd < 1.4.3-1
+Conflicts: syslog-ng
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %package mysql
@@ -117,6 +118,10 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Thu Nov 29 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.11-1
+- new upstream release
+- add conflicts (#400671)
+
 * Mon Nov 19 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.10-1
 - new upstream release
 
