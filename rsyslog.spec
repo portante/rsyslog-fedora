@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 1.19.11
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -118,6 +118,9 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Thu Dec 06 2007 Release Engineering <rel-eng at fedoraproject dot org> - 1.19.11-2
+- Rebuild for deps
+
 * Thu Nov 29 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.11-1
 - new upstream release
 - add conflicts (#400671)
