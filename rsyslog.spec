@@ -2,12 +2,12 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 1.19.11
-Release: 2%{?dist}
+Version: 1.21.2
+Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
-Source0: http://download.adiscon.com/rsyslog/%{name}-%{version}.tar.gz
+Source0: http://download.rsyslog.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
 Conflicts: logrotate < 3.5.2
@@ -118,6 +118,9 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Wed Jan 02 2008 Peter Vrabec <pvrabec@redhat.com> 1.21.2-1
+- new upstream release
+
 * Thu Dec 06 2007 Release Engineering <rel-eng at fedoraproject dot org> - 1.19.11-2
 - Rebuild for deps
 
