@@ -13,7 +13,7 @@ Source2: rsyslog.sysconfig
 Patch1: rsyslog-2.0.0-sockhang.patch
 Patch2: rsyslog-2.0.0-strerror.patch
 BuildRequires: zlib-devel
-BuildRequires: autoconf automake
+BuildRequires: autoconf automake libtool
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
