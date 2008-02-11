@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 2.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,6 +12,7 @@ Source1: rsyslog.init
 Source2: rsyslog.sysconfig
 Patch1: rsyslog-2.0.0-sockhang.patch
 Patch2: rsyslog-2.0.0-strerror.patch
+Patch3: rsyslog-2.0.0-manPage.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake libtool
 Requires: logrotate >= 3.5.2
@@ -48,6 +49,7 @@ MySQL database support to rsyslog.
 %setup -q
 %patch1 -p1 -b .sockHang
 %patch2 -p1 -b .strerror
+%patch3 -p1 -b .manPage
 autoreconf
 
 %build
@@ -105,7 +107,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING INSTALL NEWS README doc
+%doc AUTHORS COPYING INSTALL NEWS README doc/*html
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
@@ -121,6 +123,9 @@ fi
 %{_libdir}/rsyslog/ommysql.so
 
 %changelog
+* Mon Feb 11 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-3
+- fix documentation problems
+
 * Tue Jan 22 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-2
 - strerror fix (#428775)
 
