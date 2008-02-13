@@ -2,17 +2,14 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 2.0.0
-Release: 3%{?dist}
+Version: 2.0.2
+Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.rsyslog.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.sysconfig
-Patch1: rsyslog-2.0.0-sockhang.patch
-Patch2: rsyslog-2.0.0-strerror.patch
-Patch3: rsyslog-2.0.0-manPage.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake libtool
 Requires: logrotate >= 3.5.2
@@ -32,6 +29,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: mysql-devel >= 4.0
 
+%package pgsql
+Summary: PostgresSQL support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: postgresql-devel
+
 %description
 Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
 syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
@@ -45,15 +48,15 @@ at the same time being very easy to setup for the novice user.
 The rsyslog-mysql package contains a dynamic shared object that will add
 MySQL database support to rsyslog.
 
+%description pgsql
+The rsyslog-pgsql package contains a dynamic shared object that will add
+PostgreSQL database support to rsyslog.
+
 %prep
 %setup -q
-%patch1 -p1 -b .sockHang
-%patch2 -p1 -b .strerror
-%patch3 -p1 -b .manPage
-autoreconf
 
 %build
-%configure --sbindir=%{sbindir} --disable-static --enable-mysql
+%configure --sbindir=%{sbindir} --disable-static --enable-mysql --enable-pgsql
 make %{?_smp_mflags}
 
 %install
@@ -122,7 +125,15 @@ fi
 %doc plugins/ommysql/createDB.sql
 %{_libdir}/rsyslog/ommysql.so
 
+%files pgsql
+%defattr(-,root,root)
+%{_libdir}/rsyslog/ompgsql.so
+
 %changelog
+* Wed Feb 13 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.2-1
+- new upstream release
+- provide PostgresSQL support
+
 * Mon Feb 11 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-3
 - fix documentation problems
 
