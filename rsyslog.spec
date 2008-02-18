@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 2.0.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -127,9 +127,13 @@ fi
 
 %files pgsql
 %defattr(-,root,root)
+%doc plugins/ompgsql/createDB.sql
 %{_libdir}/rsyslog/ompgsql.so
 
 %changelog
+* Mon Feb 18 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.2-2
+- include createDB.sql in PostgresSQL plugin
+
 * Wed Feb 13 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.2-1
 - new upstream release
 - provide PostgresSQL support
