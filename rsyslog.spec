@@ -2,26 +2,27 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 2.0.2
-Release: 2%{?dist}
-License: GPLv2+
+Version: 3.12.1
+Release: 1%{?dist}
+License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://download.rsyslog.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
-Source2: rsyslog.sysconfig
+Source2: rsyslog.conf
+Source3: rsyslog.sysconfig
+Patch1: rsyslog-3.11.4-undef.patch
 BuildRequires: zlib-devel
-BuildRequires: autoconf automake libtool
+BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
 Requires(preun): /sbin/chkconfig /sbin/service
 Requires(postun): /sbin/service
 Provides: syslog
-Provides: sysklogd = 1.4.3-1
-Obsoletes: sysklogd < 1.4.3-1
-Conflicts: syslog-ng
+Conflicts: sysklogd < 1.4.1-43
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
 
 %package mysql
 Summary: MySQL support for rsyslog
@@ -34,6 +35,12 @@ Summary: PostgresSQL support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: postgresql-devel
+
+%package gssapi
+Summary: GSSAPI authentication and encryption support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: krb5-devel 
 
 %description
 Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
@@ -52,11 +59,17 @@ MySQL database support to rsyslog.
 The rsyslog-pgsql package contains a dynamic shared object that will add
 PostgreSQL database support to rsyslog.
 
+%description gssapi
+The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI 
+authentication and secure connections. GSSAPI is commonly used for Kerberos 
+authentication.
+
 %prep
 %setup -q
+%patch1 -p1 -b .undef
 
 %build
-%configure --sbindir=%{sbindir} --disable-static --enable-mysql --enable-pgsql
+%configure --sbindir=%{sbindir} --disable-static --enable-mysql --enable-pgsql --enable-gssapi-krb5
 make %{?_smp_mflags}
 
 %install
@@ -67,10 +80,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT%{_initrddir}
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
-install -p -m 644 redhat/rsyslog.conf $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
-install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/rsyslog
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/rsyslog
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
+install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/rsyslog
+install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog
 
 #get rid of *.la
 rm $RPM_BUILD_ROOT/%{_libdir}/rsyslog/*.la
@@ -79,23 +93,12 @@ rm $RPM_BUILD_ROOT/%{_libdir}/rsyslog/*.la
 rm -rf $RPM_BUILD_ROOT
 
 %post
-if [ $1 = 1 ]; then
-	/sbin/chkconfig --add rsyslog
-fi
+/sbin/chkconfig --add rsyslog
 for n in /var/log/{messages,secure,maillog,spooler}
 do
 	[ -f $n ] && continue
 	umask 066 && touch $n
 done
-#use sysklogd configuration files
-if [ -f /etc/syslog.conf ]; then
-	mv -f /etc/rsyslog.conf /etc/rsyslog.conf.rpmnew
-	mv -f /etc/syslog.conf  /etc/rsyslog.conf
-fi
-if [ -f /etc/sysconfig/syslog ]; then
-	mv -f /etc/sysconfig/rsyslog /etc/sysconfig/rsyslog.rpmnew
-	mv -f /etc/sysconfig/syslog  /etc/sysconfig/rsyslog
-fi
 
 %preun
 if [ $1 = 0 ]; then
@@ -108,15 +111,25 @@ if [ "$1" -ge "1" ]; then
 	service rsyslog condrestart > /dev/null 2>&1 ||:
 fi	
 
+%triggerun -- rsyslog < 3.0.0
+/bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
+
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING INSTALL NEWS README doc/*html
-%config(noreplace) %{_sysconfdir}/rsyslog.conf
-%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
-%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
+%doc AUTHORS COPYING NEWS README doc/*html
+%dir %{_libdir}/rsyslog
+%{_libdir}/rsyslog/imklog.so
+%{_libdir}/rsyslog/immark.so
+%{_libdir}/rsyslog/imtcp.so
+%{_libdir}/rsyslog/tcpsrv.so
+%{_libdir}/rsyslog/imudp.so
+%{_libdir}/rsyslog/imuxsock.so
+%{_libdir}/rsyslog/omtesting.so
+%config %{_sysconfdir}/rsyslog.conf
+%config %{_sysconfdir}/sysconfig/rsyslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 %{_initrddir}/rsyslog
 %{sbindir}/rsyslogd
-%{sbindir}/rklogd
 %{sbindir}/rfc3195d
 %{_mandir}/*/*
 
@@ -130,23 +143,49 @@ fi
 %doc plugins/ompgsql/createDB.sql
 %{_libdir}/rsyslog/ompgsql.so
 
+%files gssapi
+%defattr(-,root,root)
+%{_libdir}/rsyslog/gssutil.so
+%{_libdir}/rsyslog/imgssapi.so
+%{_libdir}/rsyslog/omgssapi.so
+
 %changelog
-* Mon Feb 18 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.2-2
-- include createDB.sql in PostgresSQL plugin
-
-* Wed Feb 13 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.2-1
-- new upstream release
-- provide PostgresSQL support
-
-* Mon Feb 11 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-3
-- fix documentation problems
-
-* Tue Jan 22 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-2
-- strerror fix (#428775)
-
-* Thu Jan 17 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-1
+* Thu Mar 06 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.1-1
 - upgrade
-- fixing bad file descriptor (#428775)
+
+* Wed Mar 05 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.0-1
+- upgrade
+
+* Mon Feb 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.11.5-1
+- upgrade
+
+* Fri Feb 01 2008 Peter Vrabec <pvrabec@redhat.com> 3.11.0-1
+- upgrade to the latests development release
+- provide PostgresSQL support
+- provide GSSAPI support
+
+* Mon Jan 21 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-7
+- change from requires sysklogd to conflicts sysklogd
+
+* Fri Jan 18 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-6
+- change logrotate file
+- use rsyslog own pid file
+
+* Thu Jan 17 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-5
+- fixing bad descriptor (#428775)
+
+* Wed Jan 16 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-4
+- rename logrotate file
+
+* Wed Jan 16 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-3
+- fix post script and init file
+
+* Wed Jan 16 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-2
+- change pid filename and use logrotata script from sysklogd
+
+* Tue Jan 15 2008 Peter Vrabec <pvrabec@redhat.com> 2.0.0-1
+- upgrade to stable release
+- spec file clean up
 
 * Wed Jan 02 2008 Peter Vrabec <pvrabec@redhat.com> 1.21.2-1
 - new upstream release

@@ -1,3 +1,4 @@
-7e214ddb80544e99dac643f1d93c81fb  rsyslog-2.0.2.tar.gz
-fe8fcd90c672701fa198dd1206df64ae  rsyslog.init
-e10d2dc3238c2cf2a54933f10b19b9bf  rsyslog.sysconfig
+12c743b21a0984467bc4c05b6ee887e2  rsyslog-3.12.1.tar.gz
+9730674162e08bcc88503a19e21ac2d4  rsyslog.conf
+04ea4165e7289f009b189968e49b9c81  rsyslog.init
+04f3868aa518d33809f5943d7bc2fc0b  rsyslog.sysconfig
