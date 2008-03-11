@@ -12,6 +12,7 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Patch1: rsyslog-3.11.4-undef.patch
+Patch2: rsyslog-3.12.1-omfile.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -67,6 +68,7 @@ authentication.
 %prep
 %setup -q
 %patch1 -p1 -b .undef
+%patch2 -p1 -b .omfile
 
 %build
 %configure --sbindir=%{sbindir} --disable-static --enable-mysql --enable-pgsql --enable-gssapi-krb5
@@ -152,6 +154,7 @@ fi
 %changelog
 * Tue Mar 11 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.1-2
 - init script fixes (#436854)
+- fix config file parsing (#436722)
 
 * Thu Mar 06 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.1-1
 - upgrade
