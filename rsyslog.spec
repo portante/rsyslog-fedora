@@ -2,8 +2,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.12.1
-Release: 2%{?dist}
+Version: 3.12.3
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,7 +12,8 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Patch1: rsyslog-3.11.4-undef.patch
-Patch2: rsyslog-3.12.1-omfile.patch
+Patch2: rsyslog-3.12.3-imklogleak.patch
+Patch3: rsyslog-3.12.3-objinfo.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -68,10 +69,16 @@ authentication.
 %prep
 %setup -q
 %patch1 -p1 -b .undef
-%patch2 -p1 -b .omfile
+%patch2 -p1 -b .imklogleak
+%patch3 -p1 -b .objinfo
 
 %build
-%configure --sbindir=%{sbindir} --disable-static --enable-mysql --enable-pgsql --enable-gssapi-krb5
+%configure	--sbindir=%{sbindir} \
+		--disable-static \
+		--enable-mysql \
+		--enable-pgsql \
+		--enable-gssapi-krb5 \
+		--enable-imfile
 make %{?_smp_mflags}
 
 %install
@@ -123,10 +130,14 @@ fi
 %{_libdir}/rsyslog/imklog.so
 %{_libdir}/rsyslog/immark.so
 %{_libdir}/rsyslog/imtcp.so
-%{_libdir}/rsyslog/tcpsrv.so
 %{_libdir}/rsyslog/imudp.so
 %{_libdir}/rsyslog/imuxsock.so
+%{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/omtesting.so
+%{_libdir}/rsyslog/lmnet.so
+%{_libdir}/rsyslog/lmregexp.so
+%{_libdir}/rsyslog/lmtcpclt.so
+%{_libdir}/rsyslog/lmtcpsrv.so
 %config %{_sysconfdir}/rsyslog.conf
 %config %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -147,11 +158,15 @@ fi
 
 %files gssapi
 %defattr(-,root,root)
-%{_libdir}/rsyslog/gssutil.so
+%{_libdir}/rsyslog/lmgssutil.so
 %{_libdir}/rsyslog/imgssapi.so
 %{_libdir}/rsyslog/omgssapi.so
 
 %changelog
+* Wed Mar 19 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.3-1
+- upgrade 
+- fix some significant memory leaks
+
 * Tue Mar 11 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.1-2
 - init script fixes (#436854)
 - fix config file parsing (#436722)

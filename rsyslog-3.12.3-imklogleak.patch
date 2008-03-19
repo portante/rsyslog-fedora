@@ -1,0 +1,54 @@
+--- rsyslog-3.12.3/plugins/imklog/ksym.c.leak	2008-03-18 23:37:23.000000000 +0100
++++ rsyslog-3.12.3/plugins/imklog/ksym.c	2008-03-18 23:42:49.000000000 +0100
+@@ -269,6 +269,12 @@
+ }
+ 
+ 
++extern void DeinitKsyms(void)
++{
++	FreeSymbols();
++}
++
++
+ /**************************************************************************
+  * Function:	FindSymbolFile
+  *
+--- rsyslog-3.12.3/plugins/imklog/imklog.h.leak	2008-03-18 23:36:57.000000000 +0100
++++ rsyslog-3.12.3/plugins/imklog/imklog.h	2008-03-18 23:41:03.000000000 +0100
+@@ -33,7 +33,9 @@
+ 
+ /* prototypes */
+ extern int InitKsyms(char *);
++extern void DeinitKsyms(void);
+ extern int InitMsyms(void);
++extern void DeinitMsyms(void);
+ extern char * ExpandKadds(char *, char *);
+ extern void SetParanoiaLevel(int);
+ extern void vsyslog(int pri, const char *fmt, va_list ap);
+--- rsyslog-3.12.3/plugins/imklog/imklog.c.leak	2008-03-18 23:37:50.000000000 +0100
++++ rsyslog-3.12.3/plugins/imklog/imklog.c	2008-03-18 23:42:22.000000000 +0100
+@@ -642,6 +642,9 @@
+ 	/* cleanup here */
+ 	if(logsrc != none)
+ 		CloseLogSrc();
++
++	DeinitKsyms();
++	DeinitMsyms();
+ ENDafterRun
+ 
+ 
+--- rsyslog-3.12.3/plugins/imklog/ksym_mod.c.leak	2008-03-18 23:37:34.000000000 +0100
++++ rsyslog-3.12.3/plugins/imklog/ksym_mod.c	2008-03-18 23:42:56.000000000 +0100
+@@ -279,6 +279,12 @@
+ }
+ 
+ 
++extern void DeinitMsyms(void)
++{
++	FreeModules();
++}
++
++
+ /**************************************************************************
+  * Function:	FreeModules
+  *
