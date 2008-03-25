@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.12.3
+Version: 3.12.4
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -12,8 +12,6 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Patch1: rsyslog-3.11.4-undef.patch
-Patch2: rsyslog-3.12.3-imklogleak.patch
-Patch3: rsyslog-3.12.3-objinfo.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -69,8 +67,6 @@ authentication.
 %prep
 %setup -q
 %patch1 -p1 -b .undef
-%patch2 -p1 -b .imklogleak
-%patch3 -p1 -b .objinfo
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -163,6 +159,9 @@ fi
 %{_libdir}/rsyslog/omgssapi.so
 
 %changelog
+* Mon Mar 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.4-1
+- upgrade
+
 * Wed Mar 19 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.3-1
 - upgrade 
 - fix some significant memory leaks
