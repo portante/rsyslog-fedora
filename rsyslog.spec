@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.12.4
+Version: 3.14.1
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -139,7 +139,6 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 %{_initrddir}/rsyslog
 %{sbindir}/rsyslogd
-%{sbindir}/rfc3195d
 %{_mandir}/*/*
 
 %files mysql
@@ -159,6 +158,9 @@ fi
 %{_libdir}/rsyslog/omgssapi.so
 
 %changelog
+* Fri Apr 04 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-1
+- upgrade
+
 * Mon Mar 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.4-1
 - upgrade
 
