@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 3.14.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -14,6 +14,7 @@ Source3: rsyslog.sysconfig
 Patch1: rsyslog-3.11.4-undef.patch
 Patch2: rsyslog-3.14.1-segfaultExprFilt.patch
 Patch3: rsyslog-3.14.1-symbolLookup.patch
+Patch4: rsyslog-3.14.1.legacyOpts.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -71,6 +72,7 @@ authentication.
 %patch1 -p1 -b .undef
 %patch2 -p1 -b .segfaultExprFilt
 %patch3 -p1 -b .symbolLookup
+%patch4 -p1 -b .legacyOpts
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -162,6 +164,10 @@ fi
 %{_libdir}/rsyslog/omgssapi.so
 
 %changelog
+* Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-5
+- prevent undesired error description in legacy 
+  warning messages
+
 * Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-4
 - adjust symbol lookup method to 2.6 kernel 
 
