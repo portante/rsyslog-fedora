@@ -2,8 +2,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.14.1
-Release: 5%{?dist}
+Version: 3.16.1
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,9 +12,7 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Patch1: rsyslog-3.11.4-undef.patch
-Patch2: rsyslog-3.14.1-segfaultExprFilt.patch
-Patch3: rsyslog-3.14.1-symbolLookup.patch
-Patch4: rsyslog-3.14.1.legacyOpts.patch
+Patch2: rsyslog-3.16.1-cfsline.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -45,6 +43,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: krb5-devel 
 
+%package relp
+Summary: RELP protocol support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: librelp-devel 
+
 %description
 Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
 syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
@@ -67,12 +71,16 @@ The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI
 authentication and secure connections. GSSAPI is commonly used for Kerberos 
 authentication.
 
+%description relp
+The rsyslog-relp package contains the rsyslog plugins that provide
+the ability to receive syslog messages via the reliable RELP
+protocol. 
+
+
 %prep
 %setup -q
 %patch1 -p1 -b .undef
-%patch2 -p1 -b .segfaultExprFilt
-%patch3 -p1 -b .symbolLookup
-%patch4 -p1 -b .legacyOpts
+%patch2 -p1 -b .cfsline
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -80,7 +88,8 @@ authentication.
 		--enable-mysql \
 		--enable-pgsql \
 		--enable-gssapi-krb5 \
-		--enable-imfile
+		--enable-imfile \
+		--enable-relp
 make %{?_smp_mflags}
 
 %install
@@ -163,7 +172,15 @@ fi
 %{_libdir}/rsyslog/imgssapi.so
 %{_libdir}/rsyslog/omgssapi.so
 
+%files relp
+%defattr(-,root,root)
+%{_libdir}/rsyslog/imrelp.so
+%{_libdir}/rsyslog/omrelp.so
+
 %changelog
+* Wed May 14 2008 Tomas Heinrich <theinric@redhat.com> 3.16.1-1
+- upgrade
+
 * Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-5
 - prevent undesired error description in legacy 
   warning messages
