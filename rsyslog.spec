@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.16.1
+Version: 3.19.3
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -11,8 +11,7 @@ Source0: http://download.rsyslog.com/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
-Patch1: rsyslog-3.11.4-undef.patch
-Patch2: rsyslog-3.16.1-cfsline.patch
+Source4: rsyslog.log
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -49,6 +48,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: librelp-devel 
 
+%package gnutls
+Summary: TLS protocol support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: gnutls-devel
+
 %description
 Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
 syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
@@ -56,7 +61,6 @@ and fine grain output format control. It is quite compatible to stock sysklogd
 and can be used as a drop-in replacement. Its advanced features make it 
 suitable for enterprise-class, encryption protected syslog relay chains while 
 at the same time being very easy to setup for the novice user.
-
 
 %description mysql
 The rsyslog-mysql package contains a dynamic shared object that will add
@@ -76,11 +80,13 @@ The rsyslog-relp package contains the rsyslog plugins that provide
 the ability to receive syslog messages via the reliable RELP
 protocol. 
 
+%description gnutls
+The rsyslog-gnutls package contains the rsyslog plugins that provide the
+ability to receive syslog messages via upcoming syslog-transport-tls
+IETF standard protocol.
 
 %prep
 %setup -q
-%patch1 -p1 -b .undef
-%patch2 -p1 -b .cfsline
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -89,7 +95,8 @@ protocol.
 		--enable-pgsql \
 		--enable-gssapi-krb5 \
 		--enable-imfile \
-		--enable-relp
+                --enable-relp \
+                --enable-gnutls
 make %{?_smp_mflags}
 
 %install
@@ -104,7 +111,7 @@ install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
 install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
 install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/rsyslog
-install -p -m 644 redhat/rsyslog.log $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog
+install -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog
 
 #get rid of *.la
 rm $RPM_BUILD_ROOT/%{_libdir}/rsyslog/*.la
@@ -149,6 +156,8 @@ fi
 %{_libdir}/rsyslog/lmregexp.so
 %{_libdir}/rsyslog/lmtcpclt.so
 %{_libdir}/rsyslog/lmtcpsrv.so
+%{_libdir}/rsyslog/lmnetstrms.so
+%{_libdir}/rsyslog/lmnsd_ptcp.so
 %config %{_sysconfdir}/rsyslog.conf
 %config %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -177,7 +186,14 @@ fi
 %{_libdir}/rsyslog/imrelp.so
 %{_libdir}/rsyslog/omrelp.so
 
+%files gnutls
+%defattr(-,root,root)
+%{_libdir}/rsyslog/lmnsd_gtls.so
+
 %changelog
+* Mon May 26 2008 Peter Vrabec <pvrabec@redhat.com> 3.19-3-1
+- upgrade to new upstream release
+
 * Wed May 14 2008 Tomas Heinrich <theinric@redhat.com> 3.16.1-1
 - upgrade
 

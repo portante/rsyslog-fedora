@@ -1,5 +1,5 @@
-rsyslog-3.14.1.tar.gz
 rsyslog.conf
-rsyslog.init
 rsyslog.sysconfig
-rsyslog-3.16.1.tar.gz
+rsyslog.init
+rsyslog.log
+rsyslog-3.19.3.tar.gz
