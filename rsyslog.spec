@@ -12,6 +12,7 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
+Patch1: rsyslog-3.19.7-symlookup.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -87,6 +88,7 @@ IETF standard protocol.
 
 %prep
 %setup -q
+%patch1 -p1 -b .symLookup
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -191,6 +193,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Fri Jun 13 2008 Peter Vrabec <pvrabec@redhat.com> 3.19.7-2
+- do not translate Oopses (#450329)
+
 * Fri Jun 13 2008 Peter Vrabec <pvrabec@redhat.com> 3.19.7-1
 - upgrade
 
