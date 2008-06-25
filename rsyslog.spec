@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 3.19.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -193,6 +193,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Jun 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.19.7-3
+- rebuild because of new gnutls
+
 * Fri Jun 13 2008 Peter Vrabec <pvrabec@redhat.com> 3.19.7-2
 - do not translate Oopses (#450329)
 
