@@ -2,8 +2,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.19.7
-Release: 3%{?dist}
+Version: 3.19.9
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,7 +12,6 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch1: rsyslog-3.19.7-symlookup.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -88,7 +87,6 @@ IETF standard protocol.
 
 %prep
 %setup -q
-%patch1 -p1 -b .symLookup
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -193,6 +191,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Fri Jul 11 2008 Lubomir Rintel <lkundrak@v3.sk> 3.19.9-1
+- upgrade
+
 * Wed Jun 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.19.7-3
 - rebuild because of new gnutls
 
