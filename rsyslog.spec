@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.21.0
+Version: 3.21.3
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -191,6 +191,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Aug 20 2008 Peter Vrabec <pvrabec@redhat.com> 3.21.3-1
+- upgrade to bugfix release
+
 * Wed Jul 23 2008 Peter Vrabec <pvrabec@redhat.com> 3.21.0-1
 - upgrade
 
