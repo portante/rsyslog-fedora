@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 3.21.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -13,6 +13,7 @@ Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 Patch0: rsyslog-3.21.3-clock.patch
+Patch1: rsyslog-3.21.3-manual.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -88,7 +89,8 @@ IETF standard protocol.
 
 %prep
 %setup -q
-%patch -p1 -b .clock
+%patch0 -p1 -b .clock
+%patch1 -p1 -b .manual
 
 %build
 %configure	--sbindir=%{sbindir} \
@@ -193,6 +195,10 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Mon Sep 01 2008 Tomas Heinrich <theinric@redhat.com> 3.21.3-3
+- fix a wrong module name in the rsyslog.conf manual page (#455086)
+- expand the rsyslog.conf manual page (#456030)
+
 * Thu Aug 28 2008 Tomas Heinrich <theinric@redhat.com> 3.21.3-2
 - fix clock rollback issue (#460230)
 
