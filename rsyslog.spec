@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 3.21.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -93,6 +93,7 @@ IETF standard protocol.
 %patch1 -p1 -b .manual
 
 %build
+export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 %configure	--sbindir=%{sbindir} \
 		--disable-static \
 		--enable-mysql \
@@ -162,8 +163,8 @@ fi
 %{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmnetstrms.so
 %{_libdir}/rsyslog/lmnsd_ptcp.so
-%config %{_sysconfdir}/rsyslog.conf
-%config %{_sysconfdir}/sysconfig/rsyslog
+%config(noreplace) %{_sysconfdir}/rsyslog.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 %{_initrddir}/rsyslog
 %{sbindir}/rsyslogd
@@ -195,6 +196,11 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Mon Sep 15 2008 Peter Vrabec <pvrabec@redhat.com> 3.21.3-4
+- use RPM_OPT_FLAGS
+- use same pid file and logrotate file as syslog-ng (#441664)
+- mark config files as noreplace (#428155)
+
 * Mon Sep 01 2008 Tomas Heinrich <theinric@redhat.com> 3.21.3-3
 - fix a wrong module name in the rsyslog.conf manual page (#455086)
 - expand the rsyslog.conf manual page (#456030)
