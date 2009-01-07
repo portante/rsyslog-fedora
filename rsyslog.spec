@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 3.21.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,6 +12,8 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
+Patch0: rsyslog-3.21.9-opts.patch
+Patch1: rsyslog-3.21.9-dodie.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -87,6 +89,8 @@ IETF standard protocol.
 
 %prep
 %setup -q
+%patch0 -p1 -b .opts
+%patch1 -p1 -b .dodie
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -96,8 +100,8 @@ export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 		--enable-pgsql \
 		--enable-gssapi-krb5 \
 		--enable-imfile \
-                --enable-relp \
-                --enable-gnutls
+		--enable-relp \
+		--enable-gnutls
 make %{?_smp_mflags}
 
 %install
@@ -192,6 +196,10 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Tue Jan 07 2009 Tomas Heinrich <theinric@redhat.com> 3.21.9-2
+- fix several legacy options handling
+- fix internal message output (#478612)
+
 * Mon Dec 15 2008 Peter Vrabec <pvrabec@redhat.com> 3.21.9-1
 - update is fixing $AllowedSender security issue
 
