@@ -1,0 +1,33 @@
+diff -up rsyslog-3.21.10/runtime/stringbuf.c.convVar rsyslog-3.21.10/runtime/stringbuf.c
+--- rsyslog-3.21.10/runtime/stringbuf.c.convVar	2009-03-13 21:32:55.000000000 +0100
++++ rsyslog-3.21.10/runtime/stringbuf.c	2009-03-13 21:39:09.000000000 +0100
+@@ -820,7 +820,7 @@ rsCStrConvertToNumber(cstr_t *pStr, numb
+ 	/* TODO: octal? hex? */
+ 	n = 0;
+ 	while(i < pStr->iStrLen && isdigit(pStr->pBuf[i])) {
+-		n = n * 10 + pStr->pBuf[i] * 10;
++		n = n * 10 + pStr->pBuf[i] - '0';
+ 		++i;
+ 	}
+ 	
+diff -up rsyslog-3.21.10/runtime/var.c.convVar rsyslog-3.21.10/runtime/var.c
+--- rsyslog-3.21.10/runtime/var.c.convVar	2009-03-13 00:31:48.000000000 +0100
++++ rsyslog-3.21.10/runtime/var.c	2009-03-13 00:44:51.000000000 +0100
+@@ -366,7 +366,7 @@ ConvForOperation(var_t *pThis, var_t *pO
+ 				case VARTYPE_NUMBER:
+ 					/* check if we can convert pThis to a number, if so use number format. */
+ 					iRet = ConvToNumber(pThis);
+-					if(iRet != RS_RET_NOT_A_NUMBER) {
++					if(iRet == RS_RET_NOT_A_NUMBER) {
+ 						CHKiRet(ConvToString(pOther));
+ 					} else {
+ 						FINALIZE; /* OK or error */
+@@ -384,7 +384,7 @@ ConvForOperation(var_t *pThis, var_t *pO
+ 					break;
+ 				case VARTYPE_STR:
+ 					iRet = ConvToNumber(pOther);
+-					if(iRet != RS_RET_NOT_A_NUMBER) {
++					if(iRet == RS_RET_NOT_A_NUMBER) {
+ 						CHKiRet(ConvToString(pThis));
+ 					} else {
+ 						FINALIZE; /* OK or error */
