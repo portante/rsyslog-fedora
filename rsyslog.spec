@@ -2,8 +2,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.21.10
-Release: 4%{?dist}
+Version: 3.21.11
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -12,8 +12,7 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch0: rsyslog-3.21.10-convVar.patch
-Patch1: rsyslog-3.21.10-HUPisRestart.patch
+Patch0: rsyslog-3.21.11-HUPisRestart.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -89,8 +88,7 @@ IETF standard protocol.
 
 %prep
 %setup -q
-%patch0 -p1 -b .convVar
-%patch1 -p1 -b .HUPisRestart
+%patch0 -p1 -b .HUPisRestart
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -196,6 +194,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Mon Apr 13 2009 Tomas Heinrich <theinric@redhat.com> 3.21.11-1
+- upgrade
+
 * Tue Mar 31 2009 Lubomir Rintel <lkundrak@v3.sk> 3.21.10-4
 - Backport HUPisRestart option
 
