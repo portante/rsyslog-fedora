@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 3.21.11
+Version: 4.2.0
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -12,7 +12,6 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch0: rsyslog-3.21.11-HUPisRestart.patch
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake
 Requires: logrotate >= 3.5.2
@@ -88,7 +87,6 @@ IETF standard protocol.
 
 %prep
 %setup -q
-%patch0 -p1 -b .HUPisRestart
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -194,6 +192,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Tue Jul 14 2009 Tomas Heinrich <theinric@redhat.com> 4.2.0-1
+- upgrade
+
 * Mon Apr 13 2009 Tomas Heinrich <theinric@redhat.com> 3.21.11-1
 - upgrade
 
