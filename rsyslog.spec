@@ -2,8 +2,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 4.2.0
-Release: 3%{?dist}
+Version: 4.4.1
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -92,6 +92,7 @@ IETF standard protocol.
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 %configure	--sbindir=%{sbindir} \
 		--disable-static \
+		--disable-testbench \
 		--enable-mysql \
 		--enable-pgsql \
 		--enable-gssapi-krb5 \
@@ -159,6 +160,7 @@ fi
 %{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmnetstrms.so
 %{_libdir}/rsyslog/lmnsd_ptcp.so
+%{_libdir}/rsyslog/lmstrmsrv.so
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -192,6 +194,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Thu Sep 03 2009 Tomas Heinrich <theinric@redhat.com> 4.4.1-1
+- upgrade to new upstream stable version
+
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 4.2.0-3
 - rebuilt with new openssl
 
