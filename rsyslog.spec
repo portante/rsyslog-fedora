@@ -3,7 +3,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 4.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -194,6 +194,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Mon Sep 14 2009 Tomas Heinrich <theinric@redhat.com> 4.4.1-2
+- adjust init script according to guidelines (#522071)
+
 * Thu Sep 03 2009 Tomas Heinrich <theinric@redhat.com> 4.4.1-1
 - upgrade to new upstream stable version
 

@@ -24,9 +24,14 @@
 . /etc/init.d/functions
 
 RETVAL=0
+PIDFILE=/var/run/syslogd.pid
+
+prog=rsyslogd
+exec=/sbin/rsyslogd
+lockfile=/var/lock/subsys/$prog
 
 start() {
-	[ -x /sbin/rsyslogd ] || exit 5
+	[ -x $exec ] || exit 5
 
 	# Source config
         if [ -f /etc/sysconfig/rsyslog ] ; then
@@ -35,23 +40,23 @@ start() {
 	umask 077
 
         echo -n $"Starting system logger: "
-        daemon rsyslogd $SYSLOGD_OPTIONS
+        daemon --pidfile="${PIDFILE}" $exec $SYSLOGD_OPTIONS
         RETVAL=$?
         echo
-        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/rsyslog
+        [ $RETVAL -eq 0 ] && touch $lockfile
         return $RETVAL
 }
 stop() {
         echo -n $"Shutting down system logger: "
-        killproc rsyslogd
+        killproc $prog
         RETVAL=$?
         echo
-        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/rsyslog
+        [ $RETVAL -eq 0 ] && rm -f $lockfile
         return $RETVAL
 }
 reload()  {
     RETVAL=1
-    syslog=`cat /var/run/syslogd.pid 2>/dev/null`
+    syslog=$(cat "${PIDFILE}" 2>/dev/null)
     echo -n "Reloading system logger..."
     if [ -n "${syslog}" ] && [ -e /proc/"${syslog}" ]; then
 	kill -HUP "$syslog";
@@ -66,7 +71,7 @@ reload()  {
     return $RETVAL
 }
 rhstatus() {
-        status rsyslogd
+        status -p "${PIDFILE}" $prog
 }
 restart() {
         stop
@@ -89,12 +94,13 @@ case "$1" in
   status)
         rhstatus
         ;;
-  condrestart)
-        [ -f /var/lock/subsys/rsyslog ] && restart || :
+  condrestart|try-restart)
+        rhstatus >/dev/null 2>&1 || exit 0
+        restart
         ;;
   *)
-        echo $"Usage: $0 {start|stop|restart|reload|force-reload|condrestart}"
-        exit 2
+        echo $"Usage: $0 {start|stop|restart|condrestart|try-restart|reload|force-reload|status}"
+        exit 3
 esac
 
 exit $?
