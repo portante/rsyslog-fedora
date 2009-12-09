@@ -2,7 +2,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 4.4.1
+Version: 4.4.2
 Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -12,8 +12,9 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
+Patch0: rsyslog-4.4.2-unlimited-select.patch
 BuildRequires: zlib-devel
-BuildRequires: autoconf automake
+BuildRequires: autoconf automake libtool
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
@@ -87,6 +88,8 @@ IETF standard protocol.
 
 %prep
 %setup -q
+%patch0 -p1 -b .unlimited-select
+libtoolize && aclocal && autoconf && automake
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -98,7 +101,8 @@ export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 		--enable-gssapi-krb5 \
 		--enable-imfile \
 		--enable-relp \
-		--enable-gnutls
+		--enable-gnutls \
+		--enable-unlimited-select
 make %{?_smp_mflags}
 
 %install
@@ -194,6 +198,13 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Dec 09 2009 Robert Scheck <robert@fedoraproject.org> 4.4.2-2
+- run libtoolize to avoid errors due mismatching libtool version
+
+* Thu Dec 03 2009 Tomas Heinrich <theinric@redhat.com> 4.4.2-1
+- upgrade to new upstream stable version 4.4.2
+- add support for arbitrary number of open file descriptors
+
 * Mon Sep 14 2009 Tomas Heinrich <theinric@redhat.com> 4.4.1-2
 - adjust init script according to guidelines (#522071)
 
