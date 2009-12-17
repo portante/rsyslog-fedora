@@ -1,9 +1,9 @@
-%define	sbindir	/sbin
+%define _exec_prefix /
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 4.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -93,8 +93,7 @@ libtoolize && aclocal && autoconf && automake
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
-%configure	--sbindir=%{sbindir} \
-		--disable-static \
+%configure	--disable-static \
 		--disable-testbench \
 		--enable-mysql \
 		--enable-pgsql \
@@ -169,7 +168,7 @@ fi
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 %{_initrddir}/rsyslog
-%{sbindir}/rsyslogd
+%{_sbindir}/rsyslogd
 %{_mandir}/*/*
 
 %files mysql
@@ -198,6 +197,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Thu Dec 17 2009 Tomas Heinrich <theinric@redhat.com> 4.4.2-3
+- change exec-prefix to /
+
 * Wed Dec 09 2009 Robert Scheck <robert@fedoraproject.org> 4.4.2-2
 - run libtoolize to avoid errors due mismatching libtool version
 
