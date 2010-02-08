@@ -1,9 +1,10 @@
-%define _exec_prefix /
+%global _exec_prefix /
+%global _libdir %{_exec_prefix}/%{_lib}
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 4.4.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -197,6 +198,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Mon Feb 08 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-4
+- redefine _libdir as it doesn't use _exec_prefix
+
 * Thu Dec 17 2009 Tomas Heinrich <theinric@redhat.com> 4.4.2-3
 - change exec-prefix to /
 
