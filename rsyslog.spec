@@ -4,7 +4,7 @@
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 4.4.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -103,7 +103,7 @@ export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 		--enable-relp \
 		--enable-gnutls \
 		--enable-unlimited-select
-make %{?_smp_mflags}
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -198,6 +198,10 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Feb 10 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-5
+- remove '_smp_mflags' make argument as it seems to be
+  producing corrupted builds
+
 * Mon Feb 08 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-4
 - redefine _libdir as it doesn't use _exec_prefix
 
