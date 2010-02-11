@@ -1,10 +1,10 @@
-%global _exec_prefix /
+%global _exec_prefix %{nil}
 %global _libdir %{_exec_prefix}/%{_lib}
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
 Version: 4.4.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -15,7 +15,6 @@ Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 Patch0: rsyslog-4.4.2-unlimited-select.patch
 BuildRequires: zlib-devel
-BuildRequires: autoconf automake libtool
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
@@ -90,7 +89,6 @@ IETF standard protocol.
 %prep
 %setup -q
 %patch0 -p1 -b .unlimited-select
-libtoolize && aclocal && autoconf && automake
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -198,6 +196,12 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Thu Feb 11 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-6
+- modify rsyslog-4.4.2-unlimited-select.patch so that
+  running autoreconf is not needed
+- remove autoconf, automake, libtool from BuildRequires
+- change exec-prefix to nil
+
 * Wed Feb 10 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-5
 - remove '_smp_mflags' make argument as it seems to be
   producing corrupted builds
