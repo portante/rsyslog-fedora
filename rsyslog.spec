@@ -3,8 +3,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemons
 Name: rsyslog
-Version: 4.4.2
-Release: 6%{?dist}
+Version: 4.6.2
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -13,7 +13,8 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch0: rsyslog-4.4.2-unlimited-select.patch
+Patch0: rsyslog-4.6.2-unlimited-select.patch
+Patch1: rsyslog-4.6.2-omfileflush.patch
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
@@ -89,6 +90,7 @@ IETF standard protocol.
 %prep
 %setup -q
 %patch0 -p1 -b .unlimited-select
+%patch1 -p1 -b .omfileflush
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -163,6 +165,7 @@ fi
 %{_libdir}/rsyslog/lmnetstrms.so
 %{_libdir}/rsyslog/lmnsd_ptcp.so
 %{_libdir}/rsyslog/lmstrmsrv.so
+%{_libdir}/rsyslog/lmzlibw.so
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -196,6 +199,10 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Apr 07 2010 Tomas Heinrich <theinric@redhat.com> 4.6.2-1
+- upgrade to new upstream stable version 4.6.2
+- correct the default value of the OMFileFlushOnTXEnd directive
+
 * Thu Feb 11 2010 Tomas Heinrich <theinric@redhat.com> 4.4.2-6
 - modify rsyslog-4.4.2-unlimited-select.patch so that
   running autoreconf is not needed
