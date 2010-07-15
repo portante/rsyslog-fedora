@@ -1,6 +1,6 @@
-diff -urp rsyslog-4.6.2.orig/config.h.in rsyslog-4.6.2/config.h.in
---- rsyslog-4.6.2.orig/config.h.in	2010-03-26 14:51:56.000000000 +0100
-+++ rsyslog-4.6.2/config.h.in	2010-04-07 18:00:07.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/config.h.in rsyslog-4.6.3/config.h.in
+--- rsyslog-4.6.3.orig/config.h.in	2010-07-14 17:40:07.083002811 +0200
++++ rsyslog-4.6.3/config.h.in	2010-07-14 17:52:28.206002831 +0200
 @@ -370,6 +370,10 @@
  #endif
  
@@ -12,10 +12,10 @@ diff -urp rsyslog-4.6.2.orig/config.h.in rsyslog-4.6.2/config.h.in
  /* Defined if valgrind support settings are to be enabled (e.g. prevents
     dlclose()). */
  #undef VALGRIND
-diff -urp rsyslog-4.6.2.orig/configure rsyslog-4.6.2/configure
---- rsyslog-4.6.2.orig/configure	2010-03-26 14:51:54.000000000 +0100
-+++ rsyslog-4.6.2/configure	2010-04-07 18:00:06.449170306 +0200
-@@ -1010,6 +1010,7 @@ enable_klog
+diff -urp rsyslog-4.6.3.orig/configure rsyslog-4.6.3/configure
+--- rsyslog-4.6.3.orig/configure	2010-07-14 17:40:07.070001784 +0200
++++ rsyslog-4.6.3/configure	2010-07-14 17:52:27.114126870 +0200
+@@ -1012,6 +1012,7 @@ enable_klog
  enable_unix
  enable_inet
  enable_fsstnd
@@ -23,7 +23,7 @@ diff -urp rsyslog-4.6.2.orig/configure rsyslog-4.6.2/configure
  enable_debug
  enable_rtinst
  enable_valgrind
-@@ -1697,6 +1698,8 @@ Optional Features:
+@@ -1700,6 +1701,8 @@ Optional Features:
    --disable-unix          Disable support for unix
    --enable-inet           Enable networking support [default=yes]
    --disable-fsstnd        Disable support for FSSTND
@@ -32,107 +32,107 @@ diff -urp rsyslog-4.6.2.orig/configure rsyslog-4.6.2/configure
    --enable-debug          Enable debug mode [default=no]
    --enable-rtinst         Enable runtime instrumentation mode [default=no]
    --enable-valgrind       Enable valgrind support settings [default=no]
-@@ -6293,13 +6296,13 @@ if test "${lt_cv_nm_interface+set}" = se
+@@ -6297,13 +6300,13 @@ if test "${lt_cv_nm_interface+set}" = se
  else
    lt_cv_nm_interface="BSD nm"
    echo "int some_variable = 0;" > conftest.$ac_ext
--  (eval echo "\"\$as_me:6296: $ac_compile\"" >&5)
-+  (eval echo "\"\$as_me:6299: $ac_compile\"" >&5)
+-  (eval echo "\"\$as_me:6300: $ac_compile\"" >&5)
++  (eval echo "\"\$as_me:6303: $ac_compile\"" >&5)
    (eval "$ac_compile" 2>conftest.err)
    cat conftest.err >&5
--  (eval echo "\"\$as_me:6299: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
-+  (eval echo "\"\$as_me:6302: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+-  (eval echo "\"\$as_me:6303: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
++  (eval echo "\"\$as_me:6306: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
    (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
    cat conftest.err >&5
--  (eval echo "\"\$as_me:6302: output\"" >&5)
-+  (eval echo "\"\$as_me:6305: output\"" >&5)
+-  (eval echo "\"\$as_me:6306: output\"" >&5)
++  (eval echo "\"\$as_me:6309: output\"" >&5)
    cat conftest.out >&5
    if $GREP 'External.*some_variable' conftest.out > /dev/null; then
      lt_cv_nm_interface="MS dumpbin"
-@@ -7504,7 +7507,7 @@ ia64-*-hpux*)
+@@ -7508,7 +7511,7 @@ ia64-*-hpux*)
    ;;
  *-*-irix6*)
    # Find out which ABI we are using.
--  echo '#line 7507 "configure"' > conftest.$ac_ext
-+  echo '#line 7510 "configure"' > conftest.$ac_ext
+-  echo '#line 7511 "configure"' > conftest.$ac_ext
++  echo '#line 7514 "configure"' > conftest.$ac_ext
    if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
    (eval $ac_compile) 2>&5
    ac_status=$?
-@@ -8843,11 +8846,11 @@ else
+@@ -8847,11 +8850,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:8846: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:8849: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:8850: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:8853: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
--   echo "$as_me:8850: \$? = $ac_status" >&5
-+   echo "$as_me:8853: \$? = $ac_status" >&5
+-   echo "$as_me:8854: \$? = $ac_status" >&5
++   echo "$as_me:8857: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9182,11 +9185,11 @@ else
+@@ -9186,11 +9189,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9185: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9188: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9189: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9192: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
--   echo "$as_me:9189: \$? = $ac_status" >&5
-+   echo "$as_me:9192: \$? = $ac_status" >&5
+-   echo "$as_me:9193: \$? = $ac_status" >&5
++   echo "$as_me:9196: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9287,11 +9290,11 @@ else
+@@ -9291,11 +9294,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9290: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9293: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9294: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9297: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:9294: \$? = $ac_status" >&5
-+   echo "$as_me:9297: \$? = $ac_status" >&5
+-   echo "$as_me:9298: \$? = $ac_status" >&5
++   echo "$as_me:9301: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -9342,11 +9345,11 @@ else
+@@ -9346,11 +9349,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9345: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9348: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9349: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9352: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:9349: \$? = $ac_status" >&5
-+   echo "$as_me:9352: \$? = $ac_status" >&5
+-   echo "$as_me:9353: \$? = $ac_status" >&5
++   echo "$as_me:9356: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -12145,7 +12148,7 @@ else
+@@ -12149,7 +12152,7 @@ else
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 12148 "configure"
-+#line 12151 "configure"
+-#line 12152 "configure"
++#line 12155 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -12241,7 +12244,7 @@ else
+@@ -12245,7 +12248,7 @@ else
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 12244 "configure"
-+#line 12247 "configure"
+-#line 12248 "configure"
++#line 12251 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -18349,6 +18352,30 @@ fi
+@@ -18353,6 +18356,30 @@ fi
  
  
  
@@ -163,7 +163,7 @@ diff -urp rsyslog-4.6.2.orig/configure rsyslog-4.6.2/configure
  # debug
  # Check whether --enable-debug was given.
  if test "${enable_debug+set}" = set; then
-@@ -22939,6 +22966,7 @@ echo "    Zlib compression support enabl
+@@ -22979,6 +23006,7 @@ echo "    Zlib compression support enabl
  echo "    rsyslog runtime will be built:            $enable_rsyslogrt"
  echo "    rsyslogd will be built:                   $enable_rsyslogd"
  echo "    custom module 1 will be built:            $enable_cust1"
@@ -171,9 +171,9 @@ diff -urp rsyslog-4.6.2.orig/configure rsyslog-4.6.2/configure
  echo
  echo "---{ input plugins }---"
  echo "    Klog functionality enabled:               $enable_klog ($os_type)"
-diff -urp rsyslog-4.6.2.orig/configure.ac rsyslog-4.6.2/configure.ac
---- rsyslog-4.6.2.orig/configure.ac	2010-03-26 14:51:21.000000000 +0100
-+++ rsyslog-4.6.2/configure.ac	2010-04-07 14:36:14.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/configure.ac rsyslog-4.6.3/configure.ac
+--- rsyslog-4.6.3.orig/configure.ac	2010-07-14 17:40:07.070889188 +0200
++++ rsyslog-4.6.3/configure.ac	2010-07-14 17:48:07.805876793 +0200
 @@ -335,6 +335,21 @@ AC_ARG_ENABLE([fsstnd],
    ])
  
@@ -196,7 +196,7 @@ diff -urp rsyslog-4.6.2.orig/configure.ac rsyslog-4.6.2/configure.ac
  # debug
  AC_ARG_ENABLE(debug,
          [AS_HELP_STRING([--enable-debug],[Enable debug mode @<:@default=no@:>@])],
-@@ -837,6 +852,7 @@ echo "    Zlib compression support enabl
+@@ -854,6 +869,7 @@ echo "    Zlib compression support enabl
  echo "    rsyslog runtime will be built:            $enable_rsyslogrt"
  echo "    rsyslogd will be built:                   $enable_rsyslogd"
  echo "    custom module 1 will be built:            $enable_cust1"
@@ -204,9 +204,9 @@ diff -urp rsyslog-4.6.2.orig/configure.ac rsyslog-4.6.2/configure.ac
  echo
  echo "---{ input plugins }---"
  echo "    Klog functionality enabled:               $enable_klog ($os_type)"
-diff -urp rsyslog-4.6.2.orig/gss-misc.c rsyslog-4.6.2/gss-misc.c
---- rsyslog-4.6.2.orig/gss-misc.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/gss-misc.c	2010-04-07 14:39:55.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/gss-misc.c rsyslog-4.6.3/gss-misc.c
+--- rsyslog-4.6.3.orig/gss-misc.c	2010-07-14 17:40:07.108880477 +0200
++++ rsyslog-4.6.3/gss-misc.c	2010-07-14 17:48:07.805876793 +0200
 @@ -51,11 +51,14 @@
  #include "obj.h"
  #include "errmsg.h"
@@ -282,9 +282,9 @@ diff -urp rsyslog-4.6.2.orig/gss-misc.c rsyslog-4.6.2/gss-misc.c
  ENDObjClassInit(gssutil)
  
  
-diff -urp rsyslog-4.6.2.orig/plugins/imgssapi/imgssapi.c rsyslog-4.6.2/plugins/imgssapi/imgssapi.c
---- rsyslog-4.6.2.orig/plugins/imgssapi/imgssapi.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/plugins/imgssapi/imgssapi.c	2010-04-07 14:42:13.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/plugins/imgssapi/imgssapi.c rsyslog-4.6.3/plugins/imgssapi/imgssapi.c
+--- rsyslog-4.6.3.orig/plugins/imgssapi/imgssapi.c	2010-07-14 17:40:07.077004561 +0200
++++ rsyslog-4.6.3/plugins/imgssapi/imgssapi.c	2010-07-14 17:48:07.806876641 +0200
 @@ -56,6 +56,7 @@
  #include "errmsg.h"
  #include "netstrm.h"
@@ -328,9 +328,9 @@ diff -urp rsyslog-4.6.2.orig/plugins/imgssapi/imgssapi.c rsyslog-4.6.2/plugins/i
  		}
  
  		context = &pGSess->gss_context;
-diff -urp rsyslog-4.6.2.orig/plugins/imudp/imudp.c rsyslog-4.6.2/plugins/imudp/imudp.c
---- rsyslog-4.6.2.orig/plugins/imudp/imudp.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/plugins/imudp/imudp.c	2010-04-07 14:45:13.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/plugins/imudp/imudp.c rsyslog-4.6.3/plugins/imudp/imudp.c
+--- rsyslog-4.6.3.orig/plugins/imudp/imudp.c	2010-07-14 17:40:07.078002733 +0200
++++ rsyslog-4.6.3/plugins/imudp/imudp.c	2010-07-14 17:48:07.807876419 +0200
 @@ -45,6 +45,7 @@
  #include "datetime.h"
  #include "prop.h"
@@ -403,9 +403,9 @@ diff -urp rsyslog-4.6.2.orig/plugins/imudp/imudp.c rsyslog-4.6.2/plugins/imudp/i
  	return iRet;
  ENDrunInput
  
-diff -urp rsyslog-4.6.2.orig/plugins/imuxsock/imuxsock.c rsyslog-4.6.2/plugins/imuxsock/imuxsock.c
---- rsyslog-4.6.2.orig/plugins/imuxsock/imuxsock.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/plugins/imuxsock/imuxsock.c	2010-04-07 14:54:35.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/plugins/imuxsock/imuxsock.c rsyslog-4.6.3/plugins/imuxsock/imuxsock.c
+--- rsyslog-4.6.3.orig/plugins/imuxsock/imuxsock.c	2010-07-14 17:40:07.075005215 +0200
++++ rsyslog-4.6.3/plugins/imuxsock/imuxsock.c	2010-07-14 17:48:07.807876419 +0200
 @@ -45,6 +45,7 @@
  #include "glbl.h"
  #include "msg.h"
@@ -470,9 +470,9 @@ diff -urp rsyslog-4.6.2.orig/plugins/imuxsock/imuxsock.c rsyslog-4.6.2/plugins/i
  	RETiRet;
  ENDrunInput
  
-diff -urp rsyslog-4.6.2.orig/runtime/Makefile.am rsyslog-4.6.2/runtime/Makefile.am
---- rsyslog-4.6.2.orig/runtime/Makefile.am	2010-03-26 14:49:33.000000000 +0100
-+++ rsyslog-4.6.2/runtime/Makefile.am	2010-04-07 14:55:15.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/Makefile.am rsyslog-4.6.3/runtime/Makefile.am
+--- rsyslog-4.6.3.orig/runtime/Makefile.am	2010-07-14 17:40:07.085002507 +0200
++++ rsyslog-4.6.3/runtime/Makefile.am	2010-07-14 17:48:07.808876476 +0200
 @@ -15,6 +15,7 @@ librsyslog_la_SOURCES = \
  	nsd.h \
  	glbl.h \
@@ -481,9 +481,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/Makefile.am rsyslog-4.6.2/runtime/Makefile.
  	conf.c \
  	conf.h \
  	parser.h \
-diff -urp rsyslog-4.6.2.orig/runtime/Makefile.in rsyslog-4.6.2/runtime/Makefile.in
---- rsyslog-4.6.2.orig/runtime/Makefile.in	2010-03-26 14:52:01.000000000 +0100
-+++ rsyslog-4.6.2/runtime/Makefile.in	2010-04-07 18:00:12.201107936 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/Makefile.in rsyslog-4.6.3/runtime/Makefile.in
+--- rsyslog-4.6.3.orig/runtime/Makefile.in	2010-07-14 17:40:07.089002039 +0200
++++ rsyslog-4.6.3/runtime/Makefile.in	2010-07-14 17:52:31.734011670 +0200
 @@ -383,6 +383,7 @@ librsyslog_la_SOURCES = \
  	nsd.h \
  	glbl.h \
@@ -492,9 +492,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/Makefile.in rsyslog-4.6.2/runtime/Makefile.
  	conf.c \
  	conf.h \
  	parser.h \
-diff -urp rsyslog-4.6.2.orig/runtime/glbl.c rsyslog-4.6.2/runtime/glbl.c
---- rsyslog-4.6.2.orig/runtime/glbl.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/runtime/glbl.c	2010-04-07 14:58:18.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/glbl.c rsyslog-4.6.3/runtime/glbl.c
+--- rsyslog-4.6.3.orig/runtime/glbl.c	2010-07-14 17:40:07.088001702 +0200
++++ rsyslog-4.6.3/runtime/glbl.c	2010-07-14 17:48:07.808876476 +0200
 @@ -72,6 +72,9 @@ static uchar *pszDfltNetstrmDrvr = NULL;
  static uchar *pszDfltNetstrmDrvrCAF = NULL; /* default CA file for the netstrm driver */
  static uchar *pszDfltNetstrmDrvrKeyFile = NULL; /* default key file for the netstrm driver (server) */
@@ -535,9 +535,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/glbl.c rsyslog-4.6.2/runtime/glbl.c
  	return RS_RET_OK;
  }
  
-diff -urp rsyslog-4.6.2.orig/runtime/glbl.h rsyslog-4.6.2/runtime/glbl.h
---- rsyslog-4.6.2.orig/runtime/glbl.h	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/runtime/glbl.h	2010-04-07 16:13:32.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/glbl.h rsyslog-4.6.3/runtime/glbl.h
+--- rsyslog-4.6.3.orig/runtime/glbl.h	2010-07-14 17:40:07.089002039 +0200
++++ rsyslog-4.6.3/runtime/glbl.h	2010-07-14 17:48:07.808876476 +0200
 @@ -62,9 +62,10 @@ BEGINinterface(glbl) /* name must also b
  	/* added v3, 2009-06-30 */
  	rsRetVal (*GenerateLocalHostNameProperty)(void);
@@ -550,9 +550,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/glbl.h rsyslog-4.6.2/runtime/glbl.h
  /* version 2 had PreserveFQDN added - rgerhards, 2008-12-08 */
  
  /* the remaining prototypes */
-diff -urp rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.c rsyslog-4.6.2/runtime/nsdsel_ptcp.c
---- rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.c	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/runtime/nsdsel_ptcp.c	2010-04-07 16:16:52.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/nsdsel_ptcp.c rsyslog-4.6.3/runtime/nsdsel_ptcp.c
+--- rsyslog-4.6.3.orig/runtime/nsdsel_ptcp.c	2010-07-14 17:40:07.089002039 +0200
++++ rsyslog-4.6.3/runtime/nsdsel_ptcp.c	2010-07-14 17:48:07.809877302 +0200
 @@ -36,6 +36,7 @@
  #include "errmsg.h"
  #include "nsd_ptcp.h"
@@ -680,9 +680,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.c rsyslog-4.6.2/runtime/nsdsel_
  			break;
  	}
  
-diff -urp rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.h rsyslog-4.6.2/runtime/nsdsel_ptcp.h
---- rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.h	2010-03-23 15:09:59.000000000 +0100
-+++ rsyslog-4.6.2/runtime/nsdsel_ptcp.h	2010-04-07 16:16:52.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/runtime/nsdsel_ptcp.h rsyslog-4.6.3/runtime/nsdsel_ptcp.h
+--- rsyslog-4.6.3.orig/runtime/nsdsel_ptcp.h	2010-07-14 17:40:07.093002059 +0200
++++ rsyslog-4.6.3/runtime/nsdsel_ptcp.h	2010-07-14 17:48:07.809877302 +0200
 @@ -31,8 +31,13 @@ typedef nsdsel_if_t nsdsel_ptcp_if_t; /*
  struct nsdsel_ptcp_s {
  	BEGINobjInstance;	/* Data to implement generic object - MUST be the first data element! */
@@ -697,9 +697,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/nsdsel_ptcp.h rsyslog-4.6.2/runtime/nsdsel_
  };
  
  /* interface is defined in nsd.h, we just implement it! */
-diff -urp rsyslog-4.6.2.orig/runtime/unlimited_select.h rsyslog-4.6.2/runtime/unlimited_select.h
---- rsyslog-4.6.2.orig/runtime/unlimited_select.h	2010-04-07 18:26:16.317180489 +0200
-+++ rsyslog-4.6.2/runtime/unlimited_select.h	2010-04-07 16:42:56.000000000 +0200
+diff -urpN rsyslog-4.6.3.orig/runtime/unlimited_select.h rsyslog-4.6.3/runtime/unlimited_select.h
+--- rsyslog-4.6.3.orig/runtime/unlimited_select.h	1970-01-01 01:00:00.000000000 +0100
++++ rsyslog-4.6.3/runtime/unlimited_select.h	2010-07-14 17:48:07.810877080 +0200
 @@ -0,0 +1,45 @@
 +/* unlimited_select.h
 + * Tweak the macros for accessing fd_set so that the select() syscall
@@ -746,9 +746,9 @@ diff -urp rsyslog-4.6.2.orig/runtime/unlimited_select.h rsyslog-4.6.2/runtime/un
 +#endif
 +
 +#endif /* #ifndef UNLIMITED_SELECT_H_INCLUDED */
-diff -urp rsyslog-4.6.2.orig/tools/syslogd.c rsyslog-4.6.2/tools/syslogd.c
---- rsyslog-4.6.2.orig/tools/syslogd.c	2010-03-26 14:49:33.000000000 +0100
-+++ rsyslog-4.6.2/tools/syslogd.c	2010-04-07 16:40:33.000000000 +0200
+diff -urp rsyslog-4.6.3.orig/tools/syslogd.c rsyslog-4.6.3/tools/syslogd.c
+--- rsyslog-4.6.3.orig/tools/syslogd.c	2010-07-14 17:40:07.067881333 +0200
++++ rsyslog-4.6.3/tools/syslogd.c	2010-07-14 17:48:07.811876509 +0200
 @@ -1842,6 +1842,9 @@ static rsRetVal setMaxFiles(void __attri
  				iFiles, errStr, (long) maxFiles.rlim_max);
  		ABORT_FINALIZE(RS_RET_ERR_RLIM_NOFILE);
