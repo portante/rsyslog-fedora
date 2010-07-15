@@ -1,9 +1,9 @@
 %global _exec_prefix %{nil}
 %global _libdir %{_exec_prefix}/%{_lib}
 
-Summary: Enhanced system logging and kernel message trapping daemons
+Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 4.6.2
+Version: 4.6.3
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -13,8 +13,7 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch0: rsyslog-4.6.2-unlimited-select.patch
-Patch1: rsyslog-4.6.2-omfileflush.patch
+Patch0: rsyslog-4.6.3-unlimited-select.patch
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
@@ -57,12 +56,12 @@ Requires: %name = %version-%release
 BuildRequires: gnutls-devel
 
 %description
-Rsyslog is an enhanced multi-threaded syslogd supporting, among others, MySQL,
-syslog/tcp, RFC 3195, permitted sender lists, filtering on any message part,
-and fine grain output format control. It is quite compatible to stock sysklogd
-and can be used as a drop-in replacement. Its advanced features make it 
-suitable for enterprise-class, encryption protected syslog relay chains while 
-at the same time being very easy to setup for the novice user.
+Rsyslog is an enhanced, multi-threaded syslog daemon. It supports MySQL,
+syslog/TCP, RFC 3195, permitted sender lists, filtering on any message part,
+and fine grain output format control. It is compatible with stock sysklogd
+and can be used as a drop-in replacement. Rsyslog is simple to set up, with
+advanced features suitable for enterprise-class, encryption-protected syslog
+relay chains.
 
 %description mysql
 The rsyslog-mysql package contains a dynamic shared object that will add
@@ -90,7 +89,6 @@ IETF standard protocol.
 %prep
 %setup -q
 %patch0 -p1 -b .unlimited-select
-%patch1 -p1 -b .omfileflush
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -102,6 +100,7 @@ export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 		--enable-imfile \
 		--enable-relp \
 		--enable-gnutls \
+		--enable-mail \
 		--enable-unlimited-select
 make
 
@@ -151,21 +150,22 @@ fi
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING NEWS README doc/*html
 %dir %{_libdir}/rsyslog
+%{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imklog.so
 %{_libdir}/rsyslog/immark.so
 %{_libdir}/rsyslog/imtcp.so
 %{_libdir}/rsyslog/imudp.so
 %{_libdir}/rsyslog/imuxsock.so
-%{_libdir}/rsyslog/imfile.so
-%{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/lmnet.so
-%{_libdir}/rsyslog/lmregexp.so
-%{_libdir}/rsyslog/lmtcpclt.so
-%{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmnetstrms.so
 %{_libdir}/rsyslog/lmnsd_ptcp.so
+%{_libdir}/rsyslog/lmregexp.so
 %{_libdir}/rsyslog/lmstrmsrv.so
+%{_libdir}/rsyslog/lmtcpclt.so
+%{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmzlibw.so
+%{_libdir}/rsyslog/omtesting.so
+%{_libdir}/rsyslog/ommail.so
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -199,6 +199,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Thu Jul 15 2010 Tomas Heinrich <theinric@redhat.com> 4.6.3-1
+- upgrade to new upstream stable version 4.6.3
+
 * Wed Apr 07 2010 Tomas Heinrich <theinric@redhat.com> 4.6.2-1
 - upgrade to new upstream stable version 4.6.2
 - correct the default value of the OMFileFlushOnTXEnd directive
