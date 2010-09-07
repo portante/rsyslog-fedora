@@ -4,7 +4,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 4.6.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -91,7 +91,8 @@ IETF standard protocol.
 %patch0 -p1 -b .unlimited-select
 
 %build
-export CFLAGS="$RPM_OPT_FLAGS -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
+export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
+export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %configure	--disable-static \
 		--disable-testbench \
 		--enable-mysql \
@@ -199,6 +200,9 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Tue Sep 07 2010 Tomas Heinrich <theinric@redhat.com> 4.6.3-2
+- build rsyslog with PIE and RELRO
+
 * Thu Jul 15 2010 Tomas Heinrich <theinric@redhat.com> 4.6.3-1
 - upgrade to new upstream stable version 4.6.3
 
