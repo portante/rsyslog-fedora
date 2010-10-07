@@ -1,19 +1,24 @@
 %global _exec_prefix %{nil}
 %global _libdir %{_exec_prefix}/%{_lib}
+%define rsyslog_statedir %{_sharedstatedir}/rsyslog
+%define rsyslog_pkidir %{_sysconfdir}/pki/rsyslog
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 4.6.3
-Release: 2%{?dist}
+Version: 5.5.7
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
-Source0: http://download.rsyslog.com/rsyslog/%{name}-%{version}.tar.gz
+Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
 Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-Patch0: rsyslog-4.6.3-unlimited-select.patch
+# remove redundant '#include' that breaks compilation
+# sent upstream
+Patch0: rsyslog-5.5.7-remove_include.patch
+
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
@@ -88,7 +93,7 @@ IETF standard protocol.
 
 %prep
 %setup -q
-%patch0 -p1 -b .unlimited-select
+%patch0 -p1 -b .removeinclude
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -113,6 +118,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT%{_initrddir}
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.d
+install -d -m 700 $RPM_BUILD_ROOT%{rsyslog_statedir}
+install -d -m 700 $RPM_BUILD_ROOT%{rsyslog_pkidir}
 
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
 install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
@@ -149,7 +157,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING NEWS README doc/*html
+%doc AUTHORS COPYING NEWS README ChangeLog doc/*html
 %dir %{_libdir}/rsyslog
 %{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imklog.so
@@ -167,9 +175,13 @@ fi
 %{_libdir}/rsyslog/lmzlibw.so
 %{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/ommail.so
+%{_libdir}/rsyslog/omruleset.so
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
+%dir %{_sysconfdir}/rsyslog.d
+%dir %{rsyslog_statedir}
+%dir %{rsyslog_pkidir}
 %{_initrddir}/rsyslog
 %{_sbindir}/rsyslogd
 %{_mandir}/*/*
@@ -200,6 +212,14 @@ fi
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
 %changelog
+* Wed Oct 06 2010 Tomas Heinrich <theinric@redhat.com> 5.5.7-1
+- upgrade to upstream version 5.5.7
+- update configuration and init files for the new major version
+- add several directories for storing auxiliary data
+- add ChangeLog to documentation
+- drop unlimited-select.patch; integrated upstream
+- add rsyslog-5.5.7-remove_include.patch to fix compilation
+
 * Tue Sep 07 2010 Tomas Heinrich <theinric@redhat.com> 4.6.3-2
 - build rsyslog with PIE and RELRO
 
