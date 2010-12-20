@@ -5,7 +5,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.5.7
+Version: 5.6.2
 Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
@@ -15,9 +15,6 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
-# remove redundant '#include' that breaks compilation
-# sent upstream
-Patch0: rsyslog-5.5.7-remove_include.patch
 
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
@@ -60,6 +57,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: gnutls-devel
 
+%package snmp
+Summary: SNMP protocol support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: net-snmp-devel
+
 %description
 Rsyslog is an enhanced, multi-threaded syslog daemon. It supports MySQL,
 syslog/TCP, RFC 3195, permitted sender lists, filtering on any message part,
@@ -91,9 +94,12 @@ The rsyslog-gnutls package contains the rsyslog plugins that provide the
 ability to receive syslog messages via upcoming syslog-transport-tls
 IETF standard protocol.
 
+%description snmp
+The rsyslog-snmp package contains the rsyslog plugin that provides the
+ability to send syslog messages as SNMPv1 and SNMPv2c traps.
+
 %prep
 %setup -q
-%patch0 -p1 -b .removeinclude
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
@@ -107,6 +113,7 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 		--enable-relp \
 		--enable-gnutls \
 		--enable-mail \
+		--enable-snmp \
 		--enable-unlimited-select
 make
 
@@ -150,10 +157,15 @@ fi
 %postun
 if [ "$1" -ge "1" ]; then
 	service rsyslog condrestart > /dev/null 2>&1 ||:
-fi	
+fi
 
 %triggerun -- rsyslog < 3.0.0
 /bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
+
+%triggerun -- rsyslog < 5.6.2
+# previous versions used a different lock file, which would break condrestart
+[ -f /var/lock/subsys/rsyslogd ] || exit 0
+mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 
 %files
 %defattr(-,root,root,-)
@@ -211,7 +223,19 @@ fi
 %defattr(-,root,root)
 %{_libdir}/rsyslog/lmnsd_gtls.so
 
+%files snmp
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omsnmp.so
+
 %changelog
+* Mon Dec 20 2010 Tomas Heinrich <theinric@redhat.com> 5.6.2-1
+- upgrade to new upstream stable version 5.6.2
+- drop rsyslog-5.5.7-remove_include.patch; applied upstream
+- provide omsnmp module
+- use correct name for lock file (#659398)
+- enable specification of the pid file (#579411)
+- init script adjustments
+
 * Wed Oct 06 2010 Tomas Heinrich <theinric@redhat.com> 5.5.7-1
 - upgrade to upstream version 5.5.7
 - update configuration and init files for the new major version

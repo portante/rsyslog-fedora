@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# rsyslog        Starts rsyslogd/rklogd.
-#
+# rsyslog        Startup script for rsyslog.
 #
 # chkconfig: 2345 12 88
 # description: Syslog is the facility by which many daemons use to log \
@@ -26,21 +25,22 @@
 RETVAL=0
 PIDFILE=/var/run/syslogd.pid
 
-prog=rsyslogd
+prog=rsyslog
 exec=/sbin/rsyslogd
 lockfile=/var/lock/subsys/$prog
+
+# Source config
+if [ -f /etc/sysconfig/$prog ] ; then
+	. /etc/sysconfig/$prog
+fi
 
 start() {
 	[ -x $exec ] || exit 5
 
-	# Source config
-        if [ -f /etc/sysconfig/rsyslog ] ; then
-                . /etc/sysconfig/rsyslog
-	fi
 	umask 077
 
         echo -n $"Starting system logger: "
-        daemon --pidfile="${PIDFILE}" $exec $SYSLOGD_OPTIONS
+	daemon --pidfile="${PIDFILE}" $exec -i "${PIDFILE}" $SYSLOGD_OPTIONS
         RETVAL=$?
         echo
         [ $RETVAL -eq 0 ] && touch $lockfile
@@ -48,14 +48,14 @@ start() {
 }
 stop() {
         echo -n $"Shutting down system logger: "
-        killproc $prog
+	killproc -p "${PIDFILE}" $exec
         RETVAL=$?
         echo
         [ $RETVAL -eq 0 ] && rm -f $lockfile
         return $RETVAL
 }
 rhstatus() {
-        status -p "${PIDFILE}" $prog
+	status -p "${PIDFILE}" $exec
 }
 restart() {
         stop
