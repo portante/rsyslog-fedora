@@ -5,8 +5,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.6.2
-Release: 3%{?dist}
+Version: 5.7.9
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -15,17 +15,27 @@ Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
+# tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
+Patch0: rsyslog-5.7.9-systemd.patch
 
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
+Requires(post): systemd-units >= 20
 Requires(preun): /sbin/chkconfig /sbin/service
+Requires(preun): systemd-units >= 20
 Requires(postun): /sbin/service
+Requires(postun): systemd-units >= 20
 Provides: syslog
 Conflicts: sysklogd < 1.4.1-43
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+%package libdbi
+Summary: libdbi database support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libdbi-devel
 
 %package mysql
 Summary: MySQL support for rsyslog
@@ -63,6 +73,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: net-snmp-devel
 
+%package udpspoof
+Summary: Provides the omudpspoof module
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libnet-devel
+
 %description
 Rsyslog is an enhanced, multi-threaded syslog daemon. It supports MySQL,
 syslog/TCP, RFC 3195, permitted sender lists, filtering on any message part,
@@ -70,6 +86,11 @@ and fine grain output format control. It is compatible with stock sysklogd
 and can be used as a drop-in replacement. Rsyslog is simple to set up, with
 advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
+
+%description libdbi
+This module supports a large number of database systems via
+libdbi. Libdbi abstracts the database layer and provides drivers for
+many systems. Drivers are available via the libdbi-drivers project.
 
 %description mysql
 The rsyslog-mysql package contains a dynamic shared object that will add
@@ -98,8 +119,14 @@ IETF standard protocol.
 The rsyslog-snmp package contains the rsyslog plugin that provides the
 ability to send syslog messages as SNMPv1 and SNMPv2c traps.
 
+%description udpspoof
+This module is similar to the regular UDP forwarder, but permits to
+spoof the sender address. Also, it enables to circle through a number
+of source ports.
+
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %ifarch sparc64
@@ -112,13 +139,18 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %endif
 %configure	--disable-static \
 		--disable-testbench \
-		--enable-mysql \
-		--enable-pgsql \
+		--enable-gnutls \
 		--enable-gssapi-krb5 \
 		--enable-imfile \
-		--enable-relp \
-		--enable-gnutls \
+		--enable-libdbi \
 		--enable-mail \
+		--enable-mysql \
+		--enable-omprog \
+		--enable-omudpspoof \
+		--enable-omuxsock \
+		--enable-pgsql \
+		--enable-pmlastmsg \
+		--enable-relp \
 		--enable-snmp \
 		--enable-unlimited-select
 make
@@ -153,16 +185,27 @@ do
 	[ -f $n ] && continue
 	umask 066 && touch $n
 done
+if [ $1 -eq 1 ]; then
+        # On install (not upgrade), enable (but don't start) the
+        # units by default
+        /bin/systemctl enable rsyslog.service >/dev/null 2>&1 || :
+fi
 
 %preun
 if [ $1 = 0 ]; then
-	service rsyslog stop >/dev/null 2>&1 ||:
-	/sbin/chkconfig --del rsyslog
+        /sbin/chkconfig --del rsyslog
+        # On uninstall (not upgrade), disable and stop the units
+        /bin/systemctl --no-reload disable rsyslog.service >/dev/null 2>&1 || :
+        /bin/systemctl stop rsyslog.service >/dev/null 2>&1 || :
 fi
 
 %postun
-if [ "$1" -ge "1" ]; then
-	service rsyslog condrestart > /dev/null 2>&1 ||:
+# Reload init system configuration, to make systemd honour changed
+# or deleted unit files
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+        # On upgrade (not uninstall), optionally, restart the daemon
+        /bin/systemctl try-restart rsyslog.service >/dev/null 2>&1 || :
 fi
 
 %triggerun -- rsyslog < 3.0.0
@@ -172,6 +215,11 @@ fi
 # previous versions used a different lock file, which would break condrestart
 [ -f /var/lock/subsys/rsyslogd ] || exit 0
 mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
+
+%triggerun -- rsyslog < 5.7.8-1
+if /sbin/chkconfig --level 3 rsyslog ; then
+        /bin/systemctl --no-reload enable rsyslog.service >/dev/null 2>&1 || :
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -193,7 +241,12 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/lmzlibw.so
 %{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/ommail.so
+%{_libdir}/rsyslog/omprog.so
 %{_libdir}/rsyslog/omruleset.so
+%{_libdir}/rsyslog/omuxsock.so
+%{_libdir}/rsyslog/pmlastmsg.so
+/lib/systemd/system/rsyslog.service
+
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
@@ -203,6 +256,10 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_initrddir}/rsyslog
 %{_sbindir}/rsyslogd
 %{_mandir}/*/*
+
+%files libdbi
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omlibdbi.so
 
 %files mysql
 %defattr(-,root,root)
@@ -233,7 +290,20 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omsnmp.so
 
+%files udpspoof
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omudpspoof.so
+
 %changelog
+* Fri Mar 18 2011 Tomas Heinrich <theinric@redhat.com> 5.7.9-1
+- upgrade to new upstream version 5.7.9
+- enable compilation of several new modules,
+  create new subpackages for some of them
+- integrate changes from Lennart Poettering
+  to add support for systemd
+  - add rsyslog-5.7.9-systemd.patch to tweak the upstream
+    service file to honour configuration from /etc/sysconfig/rsyslog
+
 * Fri Mar 18 2011 Dennis Gilmore <dennis@ausil.us> - 5.6.2-3
 - sparc64 needs big PIE
 
