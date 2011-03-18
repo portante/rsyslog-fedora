@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.6.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -102,8 +102,14 @@ ability to send syslog messages as SNMPv1 and SNMPv2c traps.
 %setup -q
 
 %build
+%ifarch sparc64
+#sparc64 need big PIE
+export CFLAGS="$RPM_OPT_FLAGS -fPIE -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
+export LDFLAGS="-PIE -Wl,-z,relro -Wl,-z,now"
+%else
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
+%endif
 %configure	--disable-static \
 		--disable-testbench \
 		--enable-mysql \
@@ -228,6 +234,9 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omsnmp.so
 
 %changelog
+* Fri Mar 18 2011 Dennis Gilmore <dennis@ausil.us> - 5.6.2-3
+- sparc64 needs big PIE
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.6.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
