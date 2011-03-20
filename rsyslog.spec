@@ -132,7 +132,7 @@ of source ports.
 %ifarch sparc64
 #sparc64 need big PIE
 export CFLAGS="$RPM_OPT_FLAGS -fPIE -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
-export LDFLAGS="-PIE -Wl,-z,relro -Wl,-z,now"
+export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %else
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
