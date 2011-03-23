@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.7.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -295,6 +295,9 @@ fi
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Wed Mar 23 2011 Dan Horák <dan@danny.cz> - 5.7.9-2
+- rebuilt for mysql 5.5.10 (soname bump in libmysqlclient)
+
 * Fri Mar 18 2011 Tomas Heinrich <theinric@redhat.com> 5.7.9-1
 - upgrade to new upstream version 5.7.9
 - enable compilation of several new modules,
