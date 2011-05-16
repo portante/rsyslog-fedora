@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.7.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -208,18 +208,15 @@ if [ $1 -ge 1 ] ; then
         /bin/systemctl try-restart rsyslog.service >/dev/null 2>&1 || :
 fi
 
-%triggerun -- rsyslog < 3.0.0
-/bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
-
-%triggerun -- rsyslog < 5.6.2
-# previous versions used a different lock file, which would break condrestart
-[ -f /var/lock/subsys/rsyslogd ] || exit 0
-mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
-
 %triggerun -- rsyslog < 5.7.8-1
 if /sbin/chkconfig --level 3 rsyslog ; then
         /bin/systemctl --no-reload enable rsyslog.service >/dev/null 2>&1 || :
 fi
+# previous versions used a different lock file, which would break condrestart
+[ -f /var/lock/subsys/rsyslogd ] || exit 0
+mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
+[ -f /var/run/rklogd.pid ] || exit 0
+/bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
 
 %files
 %defattr(-,root,root,-)
@@ -295,6 +292,9 @@ fi
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon May 16 2011 Bill Nottingham <notting@redhat.com> - 5.7.9-3
+- combine triggers (as rpm will only execute one) - fixes upgrades (#699198)
+
 * Tue Apr 05 2011 Tomas Heinrich <theinric@redhat.com> 5.7.10-1
 - upgrade to new upstream version 5.7.10
 
