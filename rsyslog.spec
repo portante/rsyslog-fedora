@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.8.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -209,7 +209,7 @@ fi
 %triggerun -- rsyslog < 5.7.8-1
 %{_bindir}/systemd-sysv-convert --save rsyslog >/dev/null 2>&1 || :
 /bin/systemctl enable rsyslog.service >/dev/null 2>&1 || :
-/sbin/chkconfig --del httpd >/dev/null 2>&1 || :
+/sbin/chkconfig --del rsyslog >/dev/null 2>&1 || :
 /bin/systemctl try-restart rsyslog.service >/dev/null 2>&1 || :
 
 # previous versions used a different lock file, which would break condrestart
@@ -242,7 +242,7 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omruleset.so
 %{_libdir}/rsyslog/omuxsock.so
 %{_libdir}/rsyslog/pmlastmsg.so
-/lib/systemd/system/rsyslog.service
+%{_unitdir}/rsyslog.service
 
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
@@ -292,6 +292,10 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Jun 13 2011 Tomas Heinrich <theinric@redhat.com> 5.8.1-2
+- scriptlet correction
+- use macro in unit file's path
+
 * Fri May 20 2011 Tomas Heinrich <theinric@redhat.com> 5.8.1-1
 - upgrade to new upstream version
 - correct systemd scriptlets (#705829)
