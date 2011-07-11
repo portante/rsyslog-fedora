@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.8.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -292,6 +292,9 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Jul 11 2011 Tomas Heinrich <theinric@redhat.com> 5.8.2-2
+- rebuild for net-snmp-5.7 (soname bump in libnetsnmp)
+
 * Mon Jun 27 2011 Tomas Heinrich <theinric@redhat.com> 5.8.2-1
 - upgrade to new upstream version 5.8.2
 
