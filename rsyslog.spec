@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.8.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -23,6 +23,7 @@ Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): /sbin/chkconfig coreutils
 Requires(post): systemd-units >= 20
+Requires(post): systemd-sysv
 Requires(preun): /sbin/service
 Requires(preun): systemd-units >= 20
 Requires(postun): /sbin/service
@@ -30,6 +31,12 @@ Requires(postun): systemd-units >= 20
 Provides: syslog
 Conflicts: sysklogd < 1.4.1-43
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+%package sysvinit
+Summary: SysV init script for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+Requires(post): /sbin/chkconfig
 
 %package libdbi
 Summary: libdbi database support for rsyslog
@@ -86,6 +93,10 @@ and fine grain output format control. It is compatible with stock sysklogd
 and can be used as a drop-in replacement. Rsyslog is simple to set up, with
 advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
+
+%description sysvinit
+SysV style init script for rsyslog. It needs to be installed only if systemd
+is not used as the system init process.
 
 %description libdbi
 This module supports a large number of database systems via
@@ -207,6 +218,9 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %triggerun -- rsyslog < 5.7.8-1
+# Save the current service runlevel info
+# User must manually run systemd-sysv-convert --apply rsyslog
+# to migrate them to systemd targets
 %{_bindir}/systemd-sysv-convert --save rsyslog >/dev/null 2>&1 || :
 /bin/systemctl enable rsyslog.service >/dev/null 2>&1 || :
 /sbin/chkconfig --del rsyslog >/dev/null 2>&1 || :
@@ -217,6 +231,9 @@ fi
 mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 [ -f /var/run/rklogd.pid ] || exit 0
 /bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
+
+%triggerpostun -n rsyslog-sysvinit -- rsyslog < 5.8.2-3
+/sbin/chkconfig --add rsyslog >/dev/null 2>&1 || :
 
 %files
 %defattr(-,root,root,-)
@@ -250,9 +267,11 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %dir %{_sysconfdir}/rsyslog.d
 %dir %{rsyslog_statedir}
 %dir %{rsyslog_pkidir}
-%{_initrddir}/rsyslog
 %{_sbindir}/rsyslogd
 %{_mandir}/*/*
+
+%files sysvinit
+%attr(0755,root,root) %{_initrddir}/rsyslog
 
 %files libdbi
 %defattr(-,root,root)
@@ -292,6 +311,10 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Fri Jul 22 2011 Tomas Heinrich <theinric@redhat.com> 5.8.2-3
+- move the SysV init script into a subpackage
+- Resolves: 697533
+
 * Mon Jul 11 2011 Tomas Heinrich <theinric@redhat.com> 5.8.2-2
 - rebuild for net-snmp-5.7 (soname bump in libnetsnmp)
 
