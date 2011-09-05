@@ -5,8 +5,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.8.2
-Release: 3%{?dist}
+Version: 5.8.5
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -16,7 +16,7 @@ Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
-Patch0: rsyslog-5.7.9-systemd.patch
+Patch0: rsyslog-5.8.5-systemd.patch
 
 BuildRequires: zlib-devel
 Requires: logrotate >= 3.5.2
@@ -311,6 +311,9 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Sep 05 2011 Tomas Heinrich <theinric@redhat.com> 5.8.5-1
+- upgrade to new upstream version (CVE-2011-3200)
+
 * Fri Jul 22 2011 Tomas Heinrich <theinric@redhat.com> 5.8.2-3
 - move the SysV init script into a subpackage
 - Resolves: 697533
