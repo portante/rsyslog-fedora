@@ -5,8 +5,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.8.5
-Release: 3%{?dist}
+Version: 5.8.6
+Release: 1%{?dist}
 License: GPLv3+
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -30,7 +30,7 @@ Requires(preun): systemd-units >= 20
 Requires(postun): /sbin/service
 Requires(postun): systemd-units >= 20
 Provides: syslog
-Conflicts: sysklogd < 1.4.1-43
+Obsoletes: sysklogd
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %package sysvinit
@@ -312,6 +312,11 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Oct 25 2011 Tomas Heinrich <theinric@redhat.com> 5.8.6-1
+- upgrade to new upstream version 5.8.6
+- obsolete sysklogd
+  Resolves: #748495
+
 * Tue Oct 11 2011 Tomas Heinrich <theinric@redhat.com> 5.8.5-3
 - modify logrotate configuration to omit boot.log
   Resolves: #745093
