@@ -5,9 +5,9 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.8.6
-Release: 2%{?dist}
-License: GPLv3+
+Version: 5.8.7
+Release: 1%{?dist}
+License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
@@ -17,6 +17,8 @@ Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
 Patch0: rsyslog-5.8.5-systemd.patch
+Patch1: rsyslog-5.8.7-sysklogd-compat-1-template.patch
+Patch2: rsyslog-5.8.7-sysklogd-compat-2-option.patch
 
 BuildRequires: zlib-devel
 BuildRequires: systemd-units >= 18
@@ -30,7 +32,7 @@ Requires(preun): systemd-units >= 20
 Requires(postun): /sbin/service
 Requires(postun): systemd-units >= 20
 Provides: syslog
-Obsoletes: sysklogd
+Obsoletes: sysklogd < 1.5-11
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %package sysvinit
@@ -139,6 +141,8 @@ of source ports.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
 %build
 %ifarch sparc64
@@ -312,6 +316,13 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Jan 23 2012 Tomas Heinrich <theinric@redhat.com> 5.8.7-1
+- upgrade to new upstream version 5.8.7
+- change license from 'GPLv3+' to '(GPLv3+ and ASL 2.0)'
+  http://blog.gerhards.net/2012/01/rsyslog-licensing-update.html
+- use a specific version for obsoleting sysklogd
+- add patches for better sysklogd compatibility (taken from upstream)
+
 * Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.8.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
