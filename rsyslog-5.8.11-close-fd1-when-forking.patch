@@ -1,0 +1,45 @@
+diff -up rsyslog-5.8.11/runtime/debug.c.orig rsyslog-5.8.11/runtime/debug.c
+--- rsyslog-5.8.11/runtime/debug.c.orig	2012-05-23 17:41:49.442845286 +0200
++++ rsyslog-5.8.11/runtime/debug.c	2012-05-23 17:42:34.202282641 +0200
+@@ -68,7 +68,7 @@ static int bPrintAllDebugOnExit = 0;
+ static int bAbortTrace = 1;	/* print a trace after SIGABRT or SIGSEGV */
+ static char *pszAltDbgFileName = NULL; /* if set, debug output is *also* sent to here */
+ static int altdbg = -1;	/* and the handle for alternate debug output */
+-static int stddbg;
++int stddbg = 1; /* the handle for regular debug output, set to stdout if not forking, -1 otherwise */
+ 
+ /* list of files/objects that should be printed */
+ typedef struct dbgPrintName_s {
+@@ -1297,8 +1297,6 @@ dbgGetRuntimeOptions(void)
+ 	uchar *optname;
+ 
+ 	/* set some defaults */
+-	stddbg = 1;
+-
+ 	if((pszOpts = (uchar*) getenv("RSYSLOG_DEBUG")) != NULL) {
+ 		/* we have options set, so let's process them */
+ 		while(dbgGetRTOptNamVal(&pszOpts, &optname, &optval)) {
+diff -up rsyslog-5.8.11/runtime/debug.h.orig rsyslog-5.8.11/runtime/debug.h
+--- rsyslog-5.8.11/runtime/debug.h.orig	2012-05-23 17:41:53.392795633 +0200
++++ rsyslog-5.8.11/runtime/debug.h	2012-05-23 17:42:34.203282628 +0200
+@@ -35,6 +35,7 @@
+ /* external static data elements (some time to be replaced) */
+ extern int Debug;		/* debug flag  - read-only after startup */
+ extern int debugging_on;	 /* read-only, except on sig USR1 */
++extern int stddbg; /* the handle for regular debug output, set to stdout if not forking, -1 otherwise */
+ 
+ /* data types */
+ 
+diff -up rsyslog-5.8.11/tools/syslogd.c.orig rsyslog-5.8.11/tools/syslogd.c
+--- rsyslog-5.8.11/tools/syslogd.c.orig	2012-05-03 13:52:27.000000000 +0200
++++ rsyslog-5.8.11/tools/syslogd.c	2012-05-23 17:42:34.210282540 +0200
+@@ -2514,6 +2514,9 @@ doGlblProcessInit(void)
+ 			sigAct.sa_handler = doexit;
+ 			sigaction(SIGTERM, &sigAct, NULL);
+ 
++			/* stop writing debug messages to stdout (if debugging is on) */
++			stddbg = -1;
++
+ 			if (fork()) {
+ 				/* Parent process
+ 				 */

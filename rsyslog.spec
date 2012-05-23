@@ -5,8 +5,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.8.7
-Release: 2%{?dist}
+Version: 5.8.11
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -19,6 +19,9 @@ Source4: rsyslog.log
 Patch0: rsyslog-5.8.5-systemd.patch
 Patch1: rsyslog-5.8.7-sysklogd-compat-1-template.patch
 Patch2: rsyslog-5.8.7-sysklogd-compat-2-option.patch
+Patch3: rsyslog-5.8.11-manpage-dbg-mode.patch
+Patch4: rsyslog-5.8.11-close-fd1-when-forking.patch
+Patch5: rsyslog-5.8.11-enlarge-cert-info-bufs.patch
 
 BuildRequires: zlib-devel
 BuildRequires: systemd-units >= 18
@@ -143,6 +146,9 @@ of source ports.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %build
 %ifarch sparc64
@@ -158,6 +164,8 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 		--enable-gnutls \
 		--enable-gssapi-krb5 \
 		--enable-imfile \
+		--enable-impstats \
+		--enable-imptcp \
 		--enable-libdbi \
 		--enable-mail \
 		--enable-mysql \
@@ -242,11 +250,13 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING NEWS README ChangeLog doc/*html
+%doc AUTHORS COPYING* NEWS README ChangeLog doc/*html
 %dir %{_libdir}/rsyslog
 %{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imklog.so
 %{_libdir}/rsyslog/immark.so
+%{_libdir}/rsyslog/impstats.so
+%{_libdir}/rsyslog/imptcp.so
 %{_libdir}/rsyslog/imtcp.so
 %{_libdir}/rsyslog/imudp.so
 %{_libdir}/rsyslog/imuxsock.so
@@ -316,6 +326,16 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+
+* Wed May 23 2012 Tomas Heinrich <theinric@redhat.com> 5.8.11-1
+- upgrade to new upstream stable version 5.8.11
+- add impstats and imptcp modules
+- include new license text files
+- consider lock file in 'status' action
+- add patch to update information on debugging in the man page
+- add patch to prevent debug output to stdout after forking
+- add patch to support ssl certificates with domain names longer than 128 chars
+
 * Fri Mar 30 2012 Jon Ciesla <limburgher@gmail.com> 5.8.7-2
 - libnet rebuild.
 

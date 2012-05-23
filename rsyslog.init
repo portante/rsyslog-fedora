@@ -55,7 +55,7 @@ stop() {
         return $RETVAL
 }
 rhstatus() {
-	status -p "${PIDFILE}" $exec
+	status -p "${PIDFILE}" -l $prog $exec
 }
 restart() {
         stop
