@@ -6,7 +6,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 5.8.11
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -16,7 +16,7 @@ Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
-Patch0: rsyslog-5.8.5-systemd.patch
+Patch0: rsyslog-5.8.11-systemd.patch
 Patch1: rsyslog-5.8.7-sysklogd-compat-1-template.patch
 Patch2: rsyslog-5.8.7-sysklogd-compat-2-option.patch
 Patch3: rsyslog-5.8.11-manpage-dbg-mode.patch
@@ -326,6 +326,8 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Wed Jun 20 2012 Tomas Heinrich <theinric@redhat.com> 5.8.11-2
+- update systemd patch: remove the 'ExecStartPre' option
 
 * Wed May 23 2012 Tomas Heinrich <theinric@redhat.com> 5.8.11-1
 - upgrade to new upstream stable version 5.8.11
