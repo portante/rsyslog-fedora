@@ -5,47 +5,77 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 5.8.11
-Release: 3%{?dist}
+Version: 7.2.2
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
-Source1: rsyslog.init
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
-Patch0: rsyslog-5.8.11-systemd.patch
-Patch1: rsyslog-5.8.7-sysklogd-compat-1-template.patch
-Patch2: rsyslog-5.8.7-sysklogd-compat-2-option.patch
-Patch3: rsyslog-5.8.11-manpage-dbg-mode.patch
-Patch4: rsyslog-5.8.11-close-fd1-when-forking.patch
+Patch0: rsyslog-7.2.2-systemd.patch
+Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
+# prevent modification of trusted properties (proposed upstream)
+Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 Patch5: rsyslog-5.8.11-enlarge-cert-info-bufs.patch
 
+BuildRequires: bison
+BuildRequires: flex
+BuildRequires: json-c-devel
+BuildRequires: libuuid-devel
+BuildRequires: pkgconfig
 BuildRequires: zlib-devel
-BuildRequires: systemd-units >= 18
+
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
-Requires(post): /sbin/chkconfig coreutils
-Requires(post): systemd-units >= 20
-Requires(post): systemd-sysv
-Requires(preun): /sbin/service
-Requires(preun): systemd-units >= 20
-Requires(postun): /sbin/service
-Requires(postun): systemd-units >= 20
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+
 Provides: syslog
 Obsoletes: sysklogd < 1.5-11
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-%package sysvinit
-Summary: SysV init script for rsyslog
+%package doc
+Summary: Documentation for rsyslog
+Group: Documentation
+
+%package elasticsearch
+Summary: ElasticSearch output module for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-Requires(post): /sbin/chkconfig
+BuildRequires: libcurl-devel
+
+%package hiredis
+Summary: Redis support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: hiredis-devel
+
+%package mmjsonparse
+Summary: JSON enhanced logging support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package mmnormalize
+Summary: Log normalization support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libestr-devel libee-devel liblognorm-devel
+
+%package mmaudit
+Summary: Message modification module supporting Linux audit format
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package mmsnmptrapd
+Summary: Message modification module for snmptrapd generated messages
+Group: System Environment/Daemons
+Requires: %name = %version-%release
 
 %package libdbi
-Summary: libdbi database support for rsyslog
+Summary: Libdbi database support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: libdbi-devel
@@ -55,6 +85,12 @@ Summary: MySQL support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: mysql-devel >= 4.0
+
+%package mongodb
+Summary: MongoDB support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libmongo-client-devel
 
 %package pgsql
 Summary: PostgresSQL support for rsyslog
@@ -66,13 +102,13 @@ BuildRequires: postgresql-devel
 Summary: GSSAPI authentication and encryption support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: krb5-devel 
+BuildRequires: krb5-devel
 
 %package relp
 Summary: RELP protocol support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: librelp-devel 
+BuildRequires: librelp-devel >= 1.0.1
 
 %package gnutls
 Summary: TLS protocol support for rsyslog
@@ -100,9 +136,30 @@ and can be used as a drop-in replacement. Rsyslog is simple to set up, with
 advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
 
-%description sysvinit
-SysV style init script for rsyslog. It needs to be installed only if systemd
-is not used as the system init process.
+%description doc
+This subpackage contains documentation for rsyslog.
+
+%description elasticsearch
+This module provides the capability for rsyslog to feed logs directly into
+Elasticsearch.
+
+%description hiredis
+This module provides output to Redis.
+
+%description mmjsonparse
+This module provides the capability to recognize and parse JSON enhanced
+syslog messages.
+
+%description mmnormalize
+This module provides the capability to normalize log messages via liblognorm.
+
+%description mmaudit
+This module provides message modification supporting Linux audit format
+in various settings.
+
+%description mmsnmptrapd
+This message modification module takes messages generated from snmptrapd and
+modifies them so that they look like they originated from the read originator.
 
 %description libdbi
 This module supports a large number of database systems via
@@ -113,19 +170,23 @@ many systems. Drivers are available via the libdbi-drivers project.
 The rsyslog-mysql package contains a dynamic shared object that will add
 MySQL database support to rsyslog.
 
+%description mongodb
+The rsyslog-mongodb package contains a dynamic shared object that will add
+MongoDB database support to rsyslog.
+
 %description pgsql
 The rsyslog-pgsql package contains a dynamic shared object that will add
 PostgreSQL database support to rsyslog.
 
 %description gssapi
-The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI 
-authentication and secure connections. GSSAPI is commonly used for Kerberos 
+The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI
+authentication and secure connections. GSSAPI is commonly used for Kerberos
 authentication.
 
 %description relp
 The rsyslog-relp package contains the rsyslog plugins that provide
 the ability to receive syslog messages via the reliable RELP
-protocol. 
+protocol.
 
 %description gnutls
 The rsyslog-gnutls package contains the rsyslog plugins that provide the
@@ -146,8 +207,6 @@ of source ports.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
 %patch5 -p1
 
 %build
@@ -159,48 +218,60 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %endif
-%configure	--disable-static \
-		--disable-testbench \
-		--enable-gnutls \
-		--enable-gssapi-krb5 \
-		--enable-imfile \
-		--enable-impstats \
-		--enable-imptcp \
-		--enable-libdbi \
-		--enable-mail \
-		--enable-mysql \
-		--enable-omprog \
-		--enable-omudpspoof \
-		--enable-omuxsock \
-		--enable-pgsql \
-		--enable-pmlastmsg \
-		--enable-relp \
-		--enable-snmp \
-		--enable-unlimited-select
+# the hiredis-devel package doesn't provide a pkg-config file
+export HIREDIS_CFLAGS=-I/usr/include/hiredis
+export HIREDIS_LIBS=-L%{_libdir}
+%configure \
+	--prefix=/usr \
+	--disable-static \
+	--disable-testbench \
+	--enable-elasticsearch \
+	--enable-gnutls \
+	--enable-gssapi-krb5 \
+	--enable-imdiag \
+	--enable-imfile \
+	--enable-impstats \
+	--enable-imptcp \
+	--enable-kmsg \
+	--enable-libdbi \
+	--enable-mail \
+	--enable-mmaudit \
+	--enable-mmjsonparse \
+	--enable-mmnormalize \
+	--enable-mmsnmptrapd \
+	--enable-mysql \
+	--enable-omhiredis \
+	--enable-ommongodb \
+	--enable-omprog \
+	--enable-omstdout \
+	--enable-omudpspoof \
+	--enable-omuxsock \
+	--enable-pgsql \
+	--enable-pmaixforwardedfrom \
+	--enable-pmcisconames \
+	--enable-pmlastmsg \
+	--enable-pmrfc3164sd \
+	--enable-pmsnare \
+	--enable-relp \
+	--enable-snmp \
+	--enable-unlimited-select
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT
+make DESTDIR=%{buildroot} install
 
-make install DESTDIR=$RPM_BUILD_ROOT
+install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
+install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
+install -d -m 755 %{buildroot}%{_sysconfdir}/rsyslog.d
+install -d -m 700 %{buildroot}%{rsyslog_statedir}
+install -d -m 700 %{buildroot}%{rsyslog_pkidir}
 
-install -d -m 755 $RPM_BUILD_ROOT%{_initrddir}
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.d
-install -d -m 700 $RPM_BUILD_ROOT%{rsyslog_statedir}
-install -d -m 700 $RPM_BUILD_ROOT%{rsyslog_pkidir}
-
-install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/rsyslog
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/rsyslog.conf
-install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/rsyslog
-install -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog
+install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rsyslog.conf
+install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/rsyslog
+install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
 
 #get rid of *.la
-rm $RPM_BUILD_ROOT/%{_libdir}/rsyslog/*.la
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+rm %{buildroot}%{_libdir}/rsyslog/*.la
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -208,52 +279,32 @@ do
 	[ -f $n ] && continue
 	umask 066 && touch $n
 done
-if [ $1 -eq 1 ]; then
-        # On install (not upgrade), enable (but don't start) the
-        # units by default
-        /bin/systemctl enable rsyslog.service >/dev/null 2>&1 || :
-fi
+%systemd_post rsyslog.service
 
 %preun
-if [ $1 = 0 ]; then
-        # On uninstall (not upgrade), disable and stop the units
-        /bin/systemctl --no-reload disable rsyslog.service >/dev/null 2>&1 || :
-        /bin/systemctl stop rsyslog.service >/dev/null 2>&1 || :
-fi
+%systemd_preun rsyslog.service
 
 %postun
-# Reload init system configuration, to make systemd honour changed
-# or deleted unit files
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-        # On upgrade (not uninstall), optionally, restart the daemon
-        /bin/systemctl try-restart rsyslog.service >/dev/null 2>&1 || :
-fi
-
-%triggerun -- rsyslog < 5.7.8-1
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply rsyslog
-# to migrate them to systemd targets
-%{_bindir}/systemd-sysv-convert --save rsyslog >/dev/null 2>&1 || :
-/bin/systemctl enable rsyslog.service >/dev/null 2>&1 || :
-/sbin/chkconfig --del rsyslog >/dev/null 2>&1 || :
-/bin/systemctl try-restart rsyslog.service >/dev/null 2>&1 || :
-
-# previous versions used a different lock file, which would break condrestart
-[ -f /var/lock/subsys/rsyslogd ] || exit 0
-mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
-[ -f /var/run/rklogd.pid ] || exit 0
-/bin/kill `cat /var/run/rklogd.pid 2> /dev/null` > /dev/null 2>&1 ||:
-
-%triggerpostun -n rsyslog-sysvinit -- rsyslog < 5.8.2-3
-/sbin/chkconfig --add rsyslog >/dev/null 2>&1 || :
+%systemd_postun_with_restart rsyslog.service
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING* NEWS README ChangeLog doc/*html
+%doc AUTHORS COPYING* NEWS README ChangeLog
 %dir %{_libdir}/rsyslog
+%dir %{_sysconfdir}/rsyslog.d
+%dir %{rsyslog_statedir}
+%dir %{rsyslog_pkidir}
+%{_sbindir}/rsyslogd
+%{_mandir}/*/*
+%{_unitdir}/rsyslog.service
+%config(noreplace) %{_sysconfdir}/rsyslog.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
+# plugins
+%{_libdir}/rsyslog/imdiag.so
 %{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imklog.so
+%{_libdir}/rsyslog/imkmsg.so
 %{_libdir}/rsyslog/immark.so
 %{_libdir}/rsyslog/impstats.so
 %{_libdir}/rsyslog/imptcp.so
@@ -272,30 +323,53 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/ommail.so
 %{_libdir}/rsyslog/omprog.so
 %{_libdir}/rsyslog/omruleset.so
+%{_libdir}/rsyslog/omstdout.so
 %{_libdir}/rsyslog/omuxsock.so
+%{_libdir}/rsyslog/pmaixforwardedfrom.so
+%{_libdir}/rsyslog/pmcisconames.so
 %{_libdir}/rsyslog/pmlastmsg.so
-%{_unitdir}/rsyslog.service
+%{_libdir}/rsyslog/pmrfc3164sd.so
+%{_libdir}/rsyslog/pmsnare.so
 
-%config(noreplace) %{_sysconfdir}/rsyslog.conf
-%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
-%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
-%dir %{_sysconfdir}/rsyslog.d
-%dir %{rsyslog_statedir}
-%dir %{rsyslog_pkidir}
-%{_sbindir}/rsyslogd
-%{_mandir}/*/*
+%files doc
+%doc doc/*html
 
-%files sysvinit
-%attr(0755,root,root) %{_initrddir}/rsyslog
+%files elasticsearch
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omelasticsearch.so
+
+%files hiredis
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omhiredis.so
 
 %files libdbi
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omlibdbi.so
 
+%files mmaudit
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmaudit.so
+
+%files mmjsonparse
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmjsonparse.so
+
+%files mmnormalize
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmnormalize.so
+
+%files mmsnmptrapd
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmsnmptrapd.so
+
 %files mysql
 %defattr(-,root,root)
 %doc plugins/ommysql/createDB.sql
 %{_libdir}/rsyslog/ommysql.so
+
+%files mongodb
+%defattr(-,root,root)
+%{_libdir}/rsyslog/ommongodb.so
 
 %files pgsql
 %defattr(-,root,root)
@@ -326,6 +400,33 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Nov 20 2012 Tomas Heinrich <theinric@redhat.com> 7.2.2-1
+- upgrade to upstream version 7.2.2
+  update BuildRequires
+- remove patches merged upstream
+  rsyslog-5.8.7-sysklogd-compat-1-template.patch
+  rsyslog-5.8.7-sysklogd-compat-2-option.patch
+  rsyslog-5.8.11-close-fd1-when-forking.patch
+- add patch from Milan Bartos <mbartos@redhat.com>
+  rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
+- remove the rsyslog-sysvinit package
+- clean up BuildRequires, Requires
+- remove the 'BuildRoot' tag
+- split off a doc package
+- compile additional modules (some of them in separate packages):
+  elasticsearch
+  hiredis
+  mmjsonparse
+  mmnormalize
+  mmaudit
+  mmsnmptrapd
+  mongodb
+- correct impossible timestamps in older changelog entries
+- correct typos, trailing spaces, etc
+- s/RPM_BUILD_ROOT/{buildroot}/
+- remove the 'clean' section
+- replace post* scriptlets with systemd macros
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.8.11-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
@@ -363,7 +464,7 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 - modify logrotate configuration to omit boot.log
   Resolves: #745093
 
-* Mon Sep 06 2011 Tomas Heinrich <theinric@redhat.com> 5.8.5-2
+* Tue Sep 06 2011 Tomas Heinrich <theinric@redhat.com> 5.8.5-2
 - add systemd-units to BuildRequires for the _unitdir macro definition
 
 * Mon Sep 05 2011 Tomas Heinrich <theinric@redhat.com> 5.8.5-1
@@ -493,7 +594,7 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 * Sat Jan 24 2009 Caolán McNamara <caolanm@redhat.com> 3.21.9-3
 - rebuild for dependencies
 
-* Tue Jan 07 2009 Tomas Heinrich <theinric@redhat.com> 3.21.9-2
+* Wed Jan 07 2009 Tomas Heinrich <theinric@redhat.com> 3.21.9-2
 - fix several legacy options handling
 - fix internal message output (#478612)
 
@@ -558,7 +659,7 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 * Fri Apr 04 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-1
 - upgrade
 
-* Mon Mar 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.4-1
+* Tue Mar 25 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.4-1
 - upgrade
 
 * Wed Mar 19 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.3-1
@@ -686,7 +787,7 @@ mv /var/lock/subsys/rsyslogd /var/lock/subsys/rsyslog
 - new upstream release with IPv6 support
 
 * Tue Jun 26 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.5-3
-- add BuildRequires for  zlib compression feature
+- add BuildRequires for zlib compression feature
 
 * Mon Jun 25 2007 Peter Vrabec <pvrabec@redhat.com> 1.13.5-2
 - some spec file adjustments.
