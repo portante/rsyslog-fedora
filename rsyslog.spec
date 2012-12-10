@@ -5,7 +5,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.2.2
+Version: 7.2.4
 Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
@@ -400,6 +400,10 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Dec 10 2012 Tomas Heinrich <theinric@redhat.com> 7.2.4-1
+- upgrade to upstream version 7.2.4
+- remove trailing whitespace
+
 * Tue Nov 20 2012 Tomas Heinrich <theinric@redhat.com> 7.2.2-1
 - upgrade to upstream version 7.2.2
   update BuildRequires
@@ -644,11 +648,11 @@ done
 - upgrade
 
 * Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-5
-- prevent undesired error description in legacy 
+- prevent undesired error description in legacy
   warning messages
 
 * Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-4
-- adjust symbol lookup method to 2.6 kernel 
+- adjust symbol lookup method to 2.6 kernel
 
 * Tue Apr 08 2008 Peter Vrabec <pvrabec@redhat.com> 3.14.1-3
 - fix segfault of expression based filters
@@ -663,7 +667,7 @@ done
 - upgrade
 
 * Wed Mar 19 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.3-1
-- upgrade 
+- upgrade
 - fix some significant memory leaks
 
 * Tue Mar 11 2008 Peter Vrabec <pvrabec@redhat.com> 3.12.1-2
@@ -731,7 +735,7 @@ done
 
 * Tue Aug 28 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.2-1
 - upstream bugfix release
-- support for negative app selector, patch from 
+- support for negative app selector, patch from
   theinric@redhat.com
 
 * Fri Aug 17 2007 Peter Vrabec <pvrabec@redhat.com> 1.19.0-1
@@ -748,7 +752,7 @@ done
 
 * Mon Jul 30 2007 Peter Vrabec <pvrabec@redhat.com> 1.17.5-1
 - upstream bugfix release
-- fix typo in provides 
+- fix typo in provides
 
 * Wed Jul 25 2007 Jeremy Katz <katzj@redhat.com> - 1.17.2-4
 - rebuild for toolchain bug
@@ -777,7 +781,7 @@ done
 - new upstream bugfix release
 
 * Tue Jul 10 2007 Peter Vrabec <pvrabec@redhat.com> 1.15.0-1
-- new upstream release introduce capability to generate output 
+- new upstream release introduce capability to generate output
   file names based on templates
 
 * Tue Jul 03 2007 Peter Vrabec <pvrabec@redhat.com> 1.14.2-1
