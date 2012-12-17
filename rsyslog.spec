@@ -2,11 +2,18 @@
 %global _libdir %{_exec_prefix}/%{_lib}
 %define rsyslog_statedir %{_sharedstatedir}/rsyslog
 %define rsyslog_pkidir %{_sysconfdir}/pki/rsyslog
+%if 0%{?rhel} >= 7
+%global want_hiredis 0
+%global want_mongodb 0
+%else
+%global want_hiredis 1
+%global want_mongodb 1
+%endif
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 7.2.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -47,11 +54,13 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: libcurl-devel
 
+%if %{want_hiredis}
 %package hiredis
 Summary: Redis support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: hiredis-devel
+%endif
 
 %package mmjsonparse
 Summary: JSON enhanced logging support
@@ -86,11 +95,13 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: mysql-devel >= 4.0
 
+%if %{want_mongodb}
 %package mongodb
 Summary: MongoDB support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: libmongo-client-devel
+%endif
 
 %package pgsql
 Summary: PostgresSQL support for rsyslog
@@ -143,8 +154,10 @@ This subpackage contains documentation for rsyslog.
 This module provides the capability for rsyslog to feed logs directly into
 Elasticsearch.
 
+%if %{want_hiredis}
 %description hiredis
 This module provides output to Redis.
+%endif
 
 %description mmjsonparse
 This module provides the capability to recognize and parse JSON enhanced
@@ -170,9 +183,11 @@ many systems. Drivers are available via the libdbi-drivers project.
 The rsyslog-mysql package contains a dynamic shared object that will add
 MySQL database support to rsyslog.
 
+%if %{want_mongodb}
 %description mongodb
 The rsyslog-mongodb package contains a dynamic shared object that will add
 MongoDB database support to rsyslog.
+%endif
 
 %description pgsql
 The rsyslog-pgsql package contains a dynamic shared object that will add
@@ -218,9 +233,12 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"syslogd.pid\\\""
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %endif
+
+%if %{want_hiredis}
 # the hiredis-devel package doesn't provide a pkg-config file
 export HIREDIS_CFLAGS=-I/usr/include/hiredis
 export HIREDIS_LIBS=-L%{_libdir}
+%endif
 %configure \
 	--prefix=/usr \
 	--disable-static \
@@ -240,8 +258,12 @@ export HIREDIS_LIBS=-L%{_libdir}
 	--enable-mmnormalize \
 	--enable-mmsnmptrapd \
 	--enable-mysql \
+%if %{want_hiredis}
 	--enable-omhiredis \
+%endif
+%if %{want_mongodb}
 	--enable-ommongodb \
+%endif
 	--enable-omprog \
 	--enable-omstdout \
 	--enable-omudpspoof \
@@ -338,9 +360,11 @@ done
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omelasticsearch.so
 
+%if %{want_hiredis}
 %files hiredis
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omhiredis.so
+%endif
 
 %files libdbi
 %defattr(-,root,root)
@@ -367,9 +391,11 @@ done
 %doc plugins/ommysql/createDB.sql
 %{_libdir}/rsyslog/ommysql.so
 
+%if %{want_mongodb}
 %files mongodb
 %defattr(-,root,root)
 %{_libdir}/rsyslog/ommongodb.so
+%endif
 
 %files pgsql
 %defattr(-,root,root)
@@ -400,6 +426,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Dec 17 2012 Tomas Heinrich <theinric@redhat.com> 7.2.4-2
+- add a condition to disable several subpackages
+
 * Mon Dec 10 2012 Tomas Heinrich <theinric@redhat.com> 7.2.4-1
 - upgrade to upstream version 7.2.4
 - remove trailing whitespace
