@@ -428,6 +428,7 @@ done
 %changelog
 * Sun Jan 13 2013 Tomas Heinrich <theinric@redhat.com> 7.2.5-1
 - upgrade to upstream version 7.2.5
+- update the compatibility mode in sysconfig file
 
 * Mon Dec 17 2012 Tomas Heinrich <theinric@redhat.com> 7.2.4-2
 - add a condition to disable several subpackages
