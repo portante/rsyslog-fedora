@@ -12,8 +12,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.2.5
-Release: 3%{?dist}
+Version: 7.3.9
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -426,6 +426,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Thu Apr 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.9-1
+- rebase to 7.3.9
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.2.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
