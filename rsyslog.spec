@@ -12,7 +12,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.3.9
+Version: 7.3.10
 Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
@@ -26,7 +26,10 @@ Patch0: rsyslog-7.2.2-systemd.patch
 Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
-Patch5: rsyslog-5.8.11-enlarge-cert-info-bufs.patch
+# #950088, interim, merged upstream
+Patch3: rsyslog-7.3.10-ratelimit-segv.patch
+# interim, merged upstream
+Patch4: rsyslog-7.3.10-correct-def-val.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -222,7 +225,8 @@ of source ports.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch5 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 %ifarch sparc64
@@ -426,6 +430,14 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Wed Apr 14 2013 Tomas Heinrich <theinric@redhat.com> 7.3.10-1
+- rebase to 7.3.10
+- add a patch to resolve #950088 - ratelimiter segfault, merged upstream
+  rsyslog-7.3.10-ratelimit-segv.patch
+- add a patch to correct a default value, merged upstream
+  rsyslog-7.3.10-correct-def-val.patch
+- drop patch 5 - fixed upstream
+
 * Thu Apr 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.9-1
 - rebase to 7.3.9
 

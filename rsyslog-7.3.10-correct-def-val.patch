@@ -1,0 +1,25 @@
+From a113af1cd151a8df1ebffdf8856b2150747b7553 Mon Sep 17 00:00:00 2001
+From: Tomas Heinrich <theinric@redhat.com>
+Date: Fri, 12 Apr 2013 14:20:56 +0200
+Subject: [PATCH 2/2] bugfix: set correct default value
+
+---
+ plugins/imuxsock/imuxsock.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/imuxsock/imuxsock.c b/plugins/imuxsock/imuxsock.c
+index 9553747..c503852 100644
+--- a/plugins/imuxsock/imuxsock.c
++++ b/plugins/imuxsock/imuxsock.c
+@@ -290,7 +290,7 @@ createInstance(instanceConf_t **pinst)
+ 	inst->sockName = NULL;
+ 	inst->pLogHostName = NULL;
+ 	inst->ratelimitInterval = DFLT_ratelimitInterval;
+-	inst->ratelimitBurst = DFLT_ratelimitSeverity;
++	inst->ratelimitBurst = DFLT_ratelimitBurst;
+ 	inst->ratelimitSeverity = DFLT_ratelimitSeverity;
+ 	inst->bUseFlowCtl = 0;
+ 	inst->bIgnoreTimestamp = 1;
+-- 
+1.7.10.4
+
