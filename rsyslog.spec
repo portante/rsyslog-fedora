@@ -9,15 +9,16 @@
 %global want_hiredis 1
 %global want_mongodb 1
 %endif
+%global snapshot 20130604git6e72fa6
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.3.10
-Release: 1%{?dist}
+Version: 7.3.15
+Release: 1.%{snapshot}%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
-Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
+Source0: %{name}-%{version}-%{snapshot}.tar.gz
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
@@ -26,16 +27,16 @@ Patch0: rsyslog-7.2.2-systemd.patch
 Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
-# #950088, interim, merged upstream
-Patch3: rsyslog-7.3.10-ratelimit-segv.patch
-# interim, merged upstream
-Patch4: rsyslog-7.3.10-correct-def-val.patch
+Patch3: rsyslog-7.3.15-imuxsock-warning.patch
 
+BuildRequires: autoconf automake libtool
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: json-c-devel
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
+BuildRequires: python-docutils
+BuildRequires: systemd-devel >= 197
 BuildRequires: zlib-devel
 
 Requires: logrotate >= 3.5.2
@@ -46,6 +47,12 @@ Requires(postun): systemd
 
 Provides: syslog
 Obsoletes: sysklogd < 1.5-11
+
+%package crypto
+Summary: Encryption support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libgcrypt-devel
 
 %package doc
 Summary: Documentation for rsyslog
@@ -112,6 +119,12 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: postgresql-devel
 
+%package rabbitmq
+Summary: RabbitMQ support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: librabbitmq-devel >= 0.2
+
 %package gssapi
 Summary: GSSAPI authentication and encryption support for rsyslog
 Group: System Environment/Daemons
@@ -122,7 +135,7 @@ BuildRequires: krb5-devel
 Summary: RELP protocol support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: librelp-devel >= 1.0.1
+BuildRequires: librelp-devel >= 1.0.3
 
 %package gnutls
 Summary: TLS protocol support for rsyslog
@@ -149,6 +162,10 @@ and fine grain output format control. It is compatible with stock sysklogd
 and can be used as a drop-in replacement. Rsyslog is simple to set up, with
 advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
+
+%description crypto
+This package containes a module providing log file encryption and a
+command line tool to process encrypted logs.
 
 %description doc
 This subpackage contains documentation for rsyslog.
@@ -196,6 +213,9 @@ MongoDB database support to rsyslog.
 The rsyslog-pgsql package contains a dynamic shared object that will add
 PostgreSQL database support to rsyslog.
 
+%description rabbitmq
+This module allows rsyslog to send messages to a RabbitMQ server.
+
 %description gssapi
 The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI
 authentication and secure connections. GSSAPI is commonly used for Kerberos
@@ -221,12 +241,11 @@ spoof the sender address. Also, it enables to circle through a number
 of source ports.
 
 %prep
-%setup -q
+%setup -q -n rsyslog
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 %build
 %ifarch sparc64
@@ -243,6 +262,7 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 export HIREDIS_CFLAGS=-I/usr/include/hiredis
 export HIREDIS_LIBS=-L%{_libdir}
 %endif
+autoreconf -is
 %configure \
 	--prefix=/usr \
 	--disable-static \
@@ -252,11 +272,12 @@ export HIREDIS_LIBS=-L%{_libdir}
 	--enable-gssapi-krb5 \
 	--enable-imdiag \
 	--enable-imfile \
+	--enable-imjournal \
 	--enable-impstats \
 	--enable-imptcp \
-	--enable-kmsg \
 	--enable-libdbi \
 	--enable-mail \
+	--enable-mmanon \
 	--enable-mmaudit \
 	--enable-mmjsonparse \
 	--enable-mmnormalize \
@@ -265,10 +286,12 @@ export HIREDIS_LIBS=-L%{_libdir}
 %if %{want_hiredis}
 	--enable-omhiredis \
 %endif
+	--enable-omjournal \
 %if %{want_mongodb}
 	--enable-ommongodb \
 %endif
 	--enable-omprog \
+	--enable-omrabbitmq \
 	--enable-omstdout \
 	--enable-omudpspoof \
 	--enable-omuxsock \
@@ -280,7 +303,9 @@ export HIREDIS_LIBS=-L%{_libdir}
 	--enable-pmsnare \
 	--enable-relp \
 	--enable-snmp \
-	--enable-unlimited-select
+	--enable-unlimited-select \
+	--enable-usertools \
+
 make
 
 %install
@@ -329,8 +354,8 @@ done
 # plugins
 %{_libdir}/rsyslog/imdiag.so
 %{_libdir}/rsyslog/imfile.so
+%{_libdir}/rsyslog/imjournal.so
 %{_libdir}/rsyslog/imklog.so
-%{_libdir}/rsyslog/imkmsg.so
 %{_libdir}/rsyslog/immark.so
 %{_libdir}/rsyslog/impstats.so
 %{_libdir}/rsyslog/imptcp.so
@@ -345,17 +370,23 @@ done
 %{_libdir}/rsyslog/lmtcpclt.so
 %{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmzlibw.so
-%{_libdir}/rsyslog/omtesting.so
+%{_libdir}/rsyslog/mmanon.so
+%{_libdir}/rsyslog/omjournal.so
 %{_libdir}/rsyslog/ommail.so
 %{_libdir}/rsyslog/omprog.so
 %{_libdir}/rsyslog/omruleset.so
 %{_libdir}/rsyslog/omstdout.so
+%{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/omuxsock.so
 %{_libdir}/rsyslog/pmaixforwardedfrom.so
 %{_libdir}/rsyslog/pmcisconames.so
 %{_libdir}/rsyslog/pmlastmsg.so
 %{_libdir}/rsyslog/pmrfc3164sd.so
 %{_libdir}/rsyslog/pmsnare.so
+
+%files crypto
+%{_bindir}/rscryutil
+%{_libdir}/rsyslog/lmcry_gcry.so
 
 %files doc
 %doc doc/*html
@@ -398,6 +429,7 @@ done
 %if %{want_mongodb}
 %files mongodb
 %defattr(-,root,root)
+%{_bindir}/logctl
 %{_libdir}/rsyslog/ommongodb.so
 %endif
 
@@ -405,6 +437,10 @@ done
 %defattr(-,root,root)
 %doc plugins/ompgsql/createDB.sql
 %{_libdir}/rsyslog/ompgsql.so
+
+%files rabbitmq
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omrabbitmq.so
 
 %files gssapi
 %defattr(-,root,root)
@@ -430,7 +466,21 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
-* Wed Apr 14 2013 Tomas Heinrich <theinric@redhat.com> 7.3.10-1
+* Tue Jun 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.15-1.20130604git6e72fa6
+- rebase to an upstream snapshot, effectively version 7.3.15
+  plus several more changes
+- drop patches 3, 4 - merged upstream
+- add a patch to silence warnings emitted by the imuxsock module
+- drop the imkmsg plugin
+- enable compilation of additional modules
+  imjournal, mmanon, omjournal, omrabbitmq
+- new subpackages: crypto, rabbitmq
+- add python-docutils and autoconf to global BuildRequires
+- drop the option for backwards compatibility from the
+  sysconfig file - it is no longer supported
+- call autoreconf to prepare the snapshot for building
+
+* Wed Apr 10 2013 Tomas Heinrich <theinric@redhat.com> 7.3.10-1
 - rebase to 7.3.10
 - add a patch to resolve #950088 - ratelimiter segfault, merged upstream
   rsyslog-7.3.10-ratelimit-segv.patch
