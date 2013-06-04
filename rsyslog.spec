@@ -321,8 +321,10 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rsyslog.conf
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/rsyslog
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
 
-#get rid of *.la
-rm %{buildroot}%{_libdir}/rsyslog/*.la
+# get rid of *.la
+rm -f %{buildroot}%{_libdir}/rsyslog/*.la
+# get rid of socket activation by default
+sed -i '/^Sockets/s/^/;/;/^Alias/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -479,6 +481,10 @@ done
 - drop the option for backwards compatibility from the
   sysconfig file - it is no longer supported
 - call autoreconf to prepare the snapshot for building
+- switch the local message source from imuxsock to imjournal
+  the imuxsock module is left enabled so it is easy to swich back to
+  it and because systemd drops a file into /etc/rsyslog.d which only
+  imuxsock can parse
 
 * Wed Apr 10 2013 Tomas Heinrich <theinric@redhat.com> 7.3.10-1
 - rebase to 7.3.10
