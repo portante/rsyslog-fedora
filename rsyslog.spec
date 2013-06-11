@@ -26,7 +26,13 @@ Patch0: rsyslog-7.2.2-systemd.patch
 Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
+# merged upstream
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
+# merged upstream
+Patch4: rsyslog-7.4.0-imjournal-segv.rhbz971471.patch
+# merged upstream
+Patch5: rsyslog-7.4.0-ratelimiter-loop.rhbz971471.patch
+Patch6: rsyslog-7.4.0-ratelimiter-loop2.rhbz971471.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -244,6 +250,9 @@ of source ports.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
 %ifarch sparc64
@@ -469,6 +478,10 @@ done
 - rebase to 7.4.0
 - drop autoconf automake libtool from BuildRequires
 - depends on systemd >= 201 because of the sd_journal_get_events() api
+- add a patch to prevent a segfault in imjournal caused by a bug in
+  systemd journal
+- add a patch to prevent an endless loop in the ratelimiter
+- add a patch to prevent another endless loop in the ratelimiter
 
 * Tue Jun 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.15-1.20130604git6e72fa6
 - rebase to an upstream snapshot, effectively version 7.3.15
