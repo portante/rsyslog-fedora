@@ -9,16 +9,15 @@
 %global want_hiredis 1
 %global want_mongodb 1
 %endif
-%global snapshot 20130604git6e72fa6
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.3.15
-Release: 1.%{snapshot}%{?dist}
+Version: 7.4.0
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
-Source0: %{name}-%{version}-%{snapshot}.tar.gz
+Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
@@ -29,14 +28,13 @@ Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
 
-BuildRequires: autoconf automake libtool
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: json-c-devel
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
-BuildRequires: systemd-devel >= 197
+BuildRequires: systemd-devel >= 201
 BuildRequires: zlib-devel
 
 Requires: logrotate >= 3.5.2
@@ -241,7 +239,7 @@ spoof the sender address. Also, it enables to circle through a number
 of source ports.
 
 %prep
-%setup -q -n rsyslog
+%setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -262,7 +260,6 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 export HIREDIS_CFLAGS=-I/usr/include/hiredis
 export HIREDIS_LIBS=-L%{_libdir}
 %endif
-autoreconf -is
 %configure \
 	--prefix=/usr \
 	--disable-static \
@@ -468,6 +465,11 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Jun 11 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
+- rebase to 7.4.0
+- drop autoconf automake libtool from BuildRequires
+- depends on systemd >= 201 because of the sd_journal_get_events() api
+
 * Tue Jun 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.15-1.20130604git6e72fa6
 - rebase to an upstream snapshot, effectively version 7.3.15
   plus several more changes
