@@ -33,6 +33,8 @@ Patch4: rsyslog-7.4.0-imjournal-segv.rhbz971471.patch
 # merged upstream
 Patch5: rsyslog-7.4.0-ratelimiter-loop.rhbz971471.patch
 Patch6: rsyslog-7.4.0-ratelimiter-loop2.rhbz971471.patch
+Patch7: rsyslog-7.4.0-ratelimiter-reset.patch
+Patch8: rsyslog-7.4.0-no-ste-file-segv.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -253,6 +255,8 @@ of source ports.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 %build
 %ifarch sparc64
@@ -474,7 +478,7 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
-* Tue Jun 11 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
+* Tue Jun 12 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
 - rebase to 7.4.0
 - drop autoconf automake libtool from BuildRequires
 - depends on systemd >= 201 because of the sd_journal_get_events() api
@@ -482,6 +486,8 @@ done
   systemd journal
 - add a patch to prevent an endless loop in the ratelimiter
 - add a patch to prevent another endless loop in the ratelimiter
+- add a patch to prevent a segfault in imjournal for undefined state file
+- add a patch to correctly reset state in the ratelimiter
 
 * Tue Jun 04 2013 Tomas Heinrich <theinric@redhat.com> 7.3.15-1.20130604git6e72fa6
 - rebase to an upstream snapshot, effectively version 7.3.15
