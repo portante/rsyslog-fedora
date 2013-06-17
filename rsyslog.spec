@@ -12,7 +12,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.4.0
+Version: 7.4.1
 Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
@@ -22,19 +22,12 @@ Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
-Patch0: rsyslog-7.2.2-systemd.patch
+Patch0: rsyslog-7.4.1-sd-service.patch
 Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 # merged upstream
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
-# merged upstream
-Patch4: rsyslog-7.4.0-imjournal-segv.rhbz971471.patch
-# merged upstream
-Patch5: rsyslog-7.4.0-ratelimiter-loop.rhbz971471.patch
-Patch6: rsyslog-7.4.0-ratelimiter-loop2.rhbz971471.patch
-Patch7: rsyslog-7.4.0-ratelimiter-reset.patch
-Patch8: rsyslog-7.4.0-no-ste-file-segv.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -42,7 +35,8 @@ BuildRequires: json-c-devel
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
-BuildRequires: systemd-devel >= 201
+# make sure systemd is in a version that isn't affected by rhbz#974132
+BuildRequires: systemd-devel >= 204-8
 BuildRequires: zlib-devel
 
 Requires: logrotate >= 3.5.2
@@ -252,11 +246,6 @@ of source ports.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
 
 %build
 %ifarch sparc64
@@ -334,7 +323,7 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
 # get rid of *.la
 rm -f %{buildroot}%{_libdir}/rsyslog/*.la
 # get rid of socket activation by default
-sed -i '/^Sockets/s/^/;/;/^Alias/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
+sed -i '/^Alias/s/^/;/;/^Requires=syslog.socket/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -478,6 +467,17 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Mon Jun 17 2013 Tomas Heinrich <theinric@redhat.com> 7.4.1-1
+- rebase to 7.4.1
+  this release adds code that somewhat mitigates damage in cases
+  where large amounts of messages are received from systemd
+  journal (see rhbz#974132)
+- regenerate patch 0
+- drop patches merged upstream: 4..8
+- add a dependency on the version of systemd which resolves the bug
+  mentioned above
+- update option name in rsyslog.conf
+
 * Tue Jun 12 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
 - rebase to 7.4.0
 - drop autoconf automake libtool from BuildRequires
