@@ -12,7 +12,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.4.1
+Version: 7.4.2
 Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
@@ -467,6 +467,13 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Jul 09 2013 Tomas Heinrich <theinric@redhat.com> 7.4.2-1
+- rebase to 7.4.2
+  most importantly, this release fixes a potential vulnerability,
+  see http://www.lsexperts.de/advisories/lse-2013-07-03.txt
+  the impact should be low as only those using the omelasticsearch
+  plugin with a specific configuration are exposed
+
 * Mon Jun 17 2013 Tomas Heinrich <theinric@redhat.com> 7.4.1-1
 - rebase to 7.4.1
   this release adds code that somewhat mitigates damage in cases
@@ -478,7 +485,7 @@ done
   mentioned above
 - update option name in rsyslog.conf
 
-* Tue Jun 12 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
+* Wed Jun 12 2013 Tomas Heinrich <theinric@redhat.com> 7.4.0-1
 - rebase to 7.4.0
 - drop autoconf automake libtool from BuildRequires
 - depends on systemd >= 201 because of the sd_journal_get_events() api
