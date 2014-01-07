@@ -390,10 +390,12 @@ done
 %{_libdir}/rsyslog/pmsnare.so
 
 %files crypto
+%defattr(-,root,root)
 %{_bindir}/rscryutil
 %{_libdir}/rsyslog/lmcry_gcry.so
 
 %files doc
+%defattr(-,root,root)
 %doc doc/*html
 
 %files elasticsearch
@@ -475,6 +477,7 @@ done
 - rebase to 7.4.7
 - install the rsyslog-recover-qi.pl tool
 - fix a typo in a package description
+- add missing defattr directives
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
