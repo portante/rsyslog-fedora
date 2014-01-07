@@ -325,6 +325,9 @@ rm -f %{buildroot}%{_libdir}/rsyslog/*.la
 # get rid of socket activation by default
 sed -i '/^Alias/s/^/;/;/^Requires=syslog.socket/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
 
+# convert line endings from "\r\n" to "\n"
+cat tools/recover_qi.pl | tr -d '\r' > %{buildroot}%{_bindir}/rsyslog-recover-qi.pl
+
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
 do
@@ -347,6 +350,7 @@ done
 %dir %{rsyslog_statedir}
 %dir %{rsyslog_pkidir}
 %{_sbindir}/rsyslogd
+%attr(755,root,root) %{_bindir}/rsyslog-recover-qi.pl
 %{_mandir}/*/*
 %{_unitdir}/rsyslog.service
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
@@ -469,6 +473,7 @@ done
 %changelog
 * Mon Jan 06 2014 Tomas Heinrich <theinric@redhat.com> 7.4.7-1
 - rebase to 7.4.7
+- install the rsyslog-recover-qi.pl tool
 - fix a typo in a package description
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.2-2
