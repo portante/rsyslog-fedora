@@ -164,7 +164,7 @@ advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
 
 %description crypto
-This package containes a module providing log file encryption and a
+This package contains a module providing log file encryption and a
 command line tool to process encrypted logs.
 
 %description doc
@@ -469,6 +469,7 @@ done
 %changelog
 * Mon Jan 06 2014 Tomas Heinrich <theinric@redhat.com> 7.4.7-1
 - rebase to 7.4.7
+- fix a typo in a package description
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
