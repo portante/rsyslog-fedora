@@ -1,5 +1,3 @@
-%global _exec_prefix %{nil}
-%global _libdir %{_exec_prefix}/%{_lib}
 %define rsyslog_statedir %{_sharedstatedir}/rsyslog
 %define rsyslog_pkidir %{_sysconfdir}/pki/rsyslog
 %if 0%{?rhel} >= 7
@@ -487,6 +485,8 @@ done
   Resolves: #1030044
 - add a patch to allow numeric specification of UIDs/GUIDs
   rsyslog-7.4.7-numeric-uid.patch
+- change the installation prefix to "/usr"
+  Resolves: #1032577
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
