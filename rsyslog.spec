@@ -28,6 +28,7 @@ Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 # merged upstream
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
+Patch4: rsyslog-7.4.7-bz1030044-remove-ads.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -246,6 +247,7 @@ of source ports.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %ifarch sparc64
@@ -478,6 +480,9 @@ done
 - install the rsyslog-recover-qi.pl tool
 - fix a typo in a package description
 - add missing defattr directives
+- add a patch to remove references to Google ads in the html docs
+  rsyslog-7.4.7-bz1030044-remove-ads.patch
+  Resolves: #1030044
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild

@@ -1,0 +1,236 @@
+From 79e4e43bcadb0fb520240c655f529874f305f786 Mon Sep 17 00:00:00 2001
+From: Tomas Heinrich <theinric@redhat.com>
+Date: Thu, 14 Nov 2013 15:14:08 +0100
+Subject: [PATCH] Remove references to Google ads from html documentation
+
+---
+ doc/rsyslog_secure_tls.html | 13 -------------
+ doc/tls_cert_ca.html        | 13 -------------
+ doc/tls_cert_client.html    | 13 -------------
+ doc/tls_cert_errmsgs.html   | 13 -------------
+ doc/tls_cert_machine.html   | 13 -------------
+ doc/tls_cert_scenario.html  | 13 -------------
+ doc/tls_cert_server.html    | 13 -------------
+ doc/tls_cert_summary.html   | 13 -------------
+ doc/tls_cert_udp_relay.html | 13 -------------
+ 9 files changed, 117 deletions(-)
+
+diff --git a/doc/rsyslog_secure_tls.html b/doc/rsyslog_secure_tls.html
+index b15e5a4..0bef2b3 100644
+--- a/doc/rsyslog_secure_tls.html
++++ b/doc/rsyslog_secure_tls.html
+@@ -38,19 +38,6 @@ below. Do not blame us if it doesn't provide what you need ;)</p>
+ </ul>
+ <p>Our secrity goals are achived via public/private key security. As such, it is 
+ vital that private keys are well protected and not accessible to third parties. 
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ If private keys have become known to third parties, the system does not provide 
+ any security at all. Also, our solution bases on X.509 certificates and a (very 
+ limited) chain of trust. We have one instance (the CA) that issues all machine 
+diff --git a/doc/tls_cert_ca.html b/doc/tls_cert_ca.html
+index 2cae404..f366462 100644
+--- a/doc/tls_cert_ca.html
++++ b/doc/tls_cert_ca.html
+@@ -23,19 +23,6 @@ Gerhards</a> (2008-06-17)</i></small></p>
+ maintained by a trustworthy person (or group) and approves the indentities of 
+ all machines. It does so by issuing their certificates. In a small setup, the 
+ administrator can provide the CA function. What is important is the the CA's 
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ private key is well-protocted and machine certificates are only issued if it is 
+ know they are valid (in a single-admin case that means the admin should not 
+ issue certificates to anyone else except himself).</p>
+diff --git a/doc/tls_cert_client.html b/doc/tls_cert_client.html
+index dbe7961..53596fc 100644
+--- a/doc/tls_cert_client.html
++++ b/doc/tls_cert_client.html
+@@ -25,19 +25,6 @@ example, that meanst turng.example.net). The client check's the server's identit
+ talks to it only if it is the expected server. This is a very important step.
+ Without it, you would not detect man-in-the-middle attacks or simple malicious servers
+ who try to get hold of your valuable log data.
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ <p><center><img src="tls_cert_100.jpg"></center>
+ <p>Steps to do:
+ <ul>
+diff --git a/doc/tls_cert_errmsgs.html b/doc/tls_cert_errmsgs.html
+index d002174..2943efc 100644
+--- a/doc/tls_cert_errmsgs.html
++++ b/doc/tls_cert_errmsgs.html
+@@ -21,19 +21,6 @@ Gerhards</a> (2008-06-17)</i></small></p>
+ 
+ <h3>Error Messages</h3>
+ <p>This page covers error message you may see when setting up
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ <a href="http://www.rsyslog.com">rsyslog</a> with TLS. Please note that many
+ of the message stem back to the TLS library being used. In those cases, there is
+ not always a good explanation available in rsyslog alone.
+diff --git a/doc/tls_cert_machine.html b/doc/tls_cert_machine.html
+index 095e15c..fe2ee90 100644
+--- a/doc/tls_cert_machine.html
++++ b/doc/tls_cert_machine.html
+@@ -22,19 +22,6 @@ Gerhards</a> (2008-06-18)</i></small></p>
+ <p>In this step, we generate certificates for each of the machines. Please note
+ that both clients and servers need certificates. The certificate identifies each
+ machine to the remote peer. The DNSName specified inside the certificate can
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ be specified inside the $&lt;object&gt;PermittedPeer config statements.
+ <p>For now, we assume that a single person (or group) is responsible for the whole
+ rsyslog system and thus it is OK if that single person is in posession of all
+diff --git a/doc/tls_cert_scenario.html b/doc/tls_cert_scenario.html
+index 7973532..88c7657 100644
+--- a/doc/tls_cert_scenario.html
++++ b/doc/tls_cert_scenario.html
+@@ -21,19 +21,6 @@ Gerhards</a> (2008-06-17)</i></small></p>
+ 
+ <h3>Sample Scenario</h3>
+ <p>We have a quite simple scenario. There is one central syslog server, 
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ named central.example.net. These server is being reported to by two Linux 
+ machines with name zuse.example.net and turing.example.net. Also, there is a 
+ third client - ada.example.net - which send both its own messages to the central 
+diff --git a/doc/tls_cert_server.html b/doc/tls_cert_server.html
+index 9c024bc..b784be1 100644
+--- a/doc/tls_cert_server.html
++++ b/doc/tls_cert_server.html
+@@ -23,19 +23,6 @@ Gerhards</a> (2008-06-18)</i></small></p>
+ via TLS protected plain tcp based syslog from those peers that are explicitely permitted
+ to send to it. The picture below show our configuration. This step configures
+ the server central.example.net.
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ <p><center><img src="tls_cert_100.jpg"></center>
+ <p><i><font color="red"><b>Important:</b> Keep in mind that the order of configuration directives
+ is very important in rsyslog. As such, the samples given below do only work if the given
+diff --git a/doc/tls_cert_summary.html b/doc/tls_cert_summary.html
+index 8e003bc..95844a8 100644
+--- a/doc/tls_cert_summary.html
++++ b/doc/tls_cert_summary.html
+@@ -20,19 +20,6 @@ Gerhards</a> (2008-07-03)</i></small></p>
+ 
+ <h3>Summary</h3>
+ <p>If you followed the steps outlined in this documentation set, you now have
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ a reasonable (for most needs) secure setup for the following environment:
+ <center><img src="tls_cert_100.jpg"></center>
+ <p>You have learned about the security decisions involved and which we
+diff --git a/doc/tls_cert_udp_relay.html b/doc/tls_cert_udp_relay.html
+index f4740ce..d44689c 100644
+--- a/doc/tls_cert_udp_relay.html
++++ b/doc/tls_cert_udp_relay.html
+@@ -26,19 +26,6 @@ directly to it, because we would like to have TLS protection for its sensitve
+ logs. If the router and the syslog relay are on a sufficiently secure private
+ network, this setup can be considered reasonable secure. In any case, it is the
+ best alternative among the possible configuration scenarios.
+-<span style="float: left">
+-<script type="text/javascript"><!--
+-google_ad_client = "pub-3204610807458280";
+-/* rsyslog doc inline */
+-google_ad_slot = "5958614527";
+-google_ad_width = 125;
+-google_ad_height = 125;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+-</span>
+ <p><center><img src="tls_cert_100.jpg"></center>
+ <p>Steps to do:
+ <ul>
+-- 
+1.8.4.3
+
