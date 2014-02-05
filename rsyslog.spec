@@ -481,6 +481,7 @@ done
 - drop patch4, merged upstream
   rsyslog-7.4.7-bz1030044-remove-ads.patch
 - add an explicit requirement on the version of libestr
+- drop the "v5" string from the conf file as it's misleading
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
