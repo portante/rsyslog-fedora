@@ -32,6 +32,7 @@ Patch6: rsyslog-7.4.7-atomicops.patch
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: json-c-devel
+BuildRequires: libestr-devel >= 0.1.9
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
@@ -479,6 +480,7 @@ done
 - rebase to 7.4.8
 - drop patch4, merged upstream
   rsyslog-7.4.7-bz1030044-remove-ads.patch
+- add an explicit requirement on the version of libestr
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
