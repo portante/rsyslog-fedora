@@ -26,6 +26,8 @@ Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 # merged upstream
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
+# merged upstream
+Patch4: rsyslog-7.4.8-omjournal-warning.patch
 Patch5: rsyslog-7.4.7-numeric-uid.patch
 Patch6: rsyslog-7.4.7-atomicops.patch
 
@@ -247,6 +249,7 @@ of source ports.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 
@@ -482,6 +485,8 @@ done
   rsyslog-7.4.7-bz1030044-remove-ads.patch
 - add an explicit requirement on the version of libestr
 - drop the "v5" string from the conf file as it's misleading
+- add rsyslog-7.4.8-omjournal-warning.patch to fix
+  a condition for issuing a warning in omjournal
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
