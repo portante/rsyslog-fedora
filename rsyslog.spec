@@ -30,6 +30,8 @@ Patch3: rsyslog-7.3.15-imuxsock-warning.patch
 Patch4: rsyslog-7.4.8-omjournal-warning.patch
 Patch5: rsyslog-7.4.7-numeric-uid.patch
 Patch6: rsyslog-7.4.7-atomicops.patch
+# merged upstream
+Patch7: rsyslog-7.4.8-dont-link-libee.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -252,6 +254,7 @@ of source ports.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 %build
 %ifarch sparc64
@@ -487,6 +490,8 @@ done
 - drop the "v5" string from the conf file as it's misleading
 - add rsyslog-7.4.8-omjournal-warning.patch to fix
   a condition for issuing a warning in omjournal
+- add rsyslog-7.4.8-dont-link-libee.patch to prevent
+  linking the main binary with libee
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
