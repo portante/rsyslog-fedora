@@ -269,7 +269,7 @@ export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %if %{want_hiredis}
 # the hiredis-devel package doesn't provide a pkg-config file
 export HIREDIS_CFLAGS=-I/usr/include/hiredis
-export HIREDIS_LIBS=-L%{_libdir}
+export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 %endif
 %configure \
 	--prefix=/usr \
@@ -494,6 +494,7 @@ done
   linking the main binary with libee
 - replace rsyslog-7.3.15-imuxsock-warning.patch
   with rsyslog-7.4.8-imuxsock-wrn.patch
+- link to libhiredis explicitly
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
