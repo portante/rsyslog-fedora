@@ -11,7 +11,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 7.4.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -28,6 +28,7 @@ Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 Patch3: rsyslog-7.3.15-imuxsock-warning.patch
 Patch4: rsyslog-7.4.7-bz1030044-remove-ads.patch
 Patch5: rsyslog-7.4.7-numeric-uid.patch
+Patch6: rsyslog-7.4.7-atomicops.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -248,6 +249,7 @@ of source ports.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 %ifarch sparc64
@@ -475,6 +477,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
+- Fixed 32-bit PowerPC build
+
 * Mon Jan 27 2014 Tomas Heinrich <theinric@redhat.com> 7.4.7-2
 - rebuild for libdbi-0.9.0-1
 
