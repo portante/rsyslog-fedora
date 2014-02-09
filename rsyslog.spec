@@ -25,7 +25,7 @@ Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 # merged upstream
-Patch3: rsyslog-7.3.15-imuxsock-warning.patch
+Patch3: rsyslog-7.4.8-imuxsock-wrn.patch
 # merged upstream
 Patch4: rsyslog-7.4.8-omjournal-warning.patch
 Patch5: rsyslog-7.4.7-numeric-uid.patch
@@ -492,6 +492,8 @@ done
   a condition for issuing a warning in omjournal
 - add rsyslog-7.4.8-dont-link-libee.patch to prevent
   linking the main binary with libee
+- replace rsyslog-7.3.15-imuxsock-warning.patch
+  with rsyslog-7.4.8-imuxsock-wrn.patch
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
