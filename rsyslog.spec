@@ -362,7 +362,8 @@ done
 %dir %{rsyslog_pkidir}
 %{_sbindir}/rsyslogd
 %attr(755,root,root) %{_bindir}/rsyslog-recover-qi.pl
-%{_mandir}/*/*
+%{_mandir}/man5/rsyslog.conf.5.gz
+%{_mandir}/man8/rsyslogd.8.gz
 %{_unitdir}/rsyslog.service
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
@@ -403,6 +404,7 @@ done
 %files crypto
 %defattr(-,root,root)
 %{_bindir}/rscryutil
+%{_mandir}/man1/rscryutil.1.gz
 %{_libdir}/rsyslog/lmcry_gcry.so
 
 %files doc
@@ -499,6 +501,7 @@ done
 - link to libhiredis explicitly
 - add a patch to prevent message loss in imjournal
   rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
+- move the rscryutil man page to the crypto subpackage
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
