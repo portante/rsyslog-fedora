@@ -32,6 +32,7 @@ Patch5: rsyslog-7.4.7-numeric-uid.patch
 Patch6: rsyslog-7.4.7-atomicops.patch
 # merged upstream
 Patch7: rsyslog-7.4.8-dont-link-libee.patch
+Patch8: rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -255,6 +256,7 @@ of source ports.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 %build
 %ifarch sparc64
@@ -495,6 +497,8 @@ done
 - replace rsyslog-7.3.15-imuxsock-warning.patch
   with rsyslog-7.4.8-imuxsock-wrn.patch
 - link to libhiredis explicitly
+- add a patch to prevent message loss in imjournal
+  rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
 
 * Sun Feb 09 2014 Lubomir Rintel <lkundrak@v3.sk> 7.4.7-3
 - Fixed 32-bit PowerPC build
