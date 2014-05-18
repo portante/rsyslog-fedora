@@ -10,8 +10,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.4.8
-Release: 2%{?dist}
+Version: 7.4.10
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -27,17 +27,16 @@ Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
 # merged upstream
 Patch3: rsyslog-7.4.8-imuxsock-wrn.patch
 # merged upstream
-Patch4: rsyslog-7.4.8-omjournal-warning.patch
 Patch5: rsyslog-7.4.7-numeric-uid.patch
 Patch6: rsyslog-7.4.7-atomicops.patch
 # merged upstream
-Patch7: rsyslog-7.4.8-dont-link-libee.patch
 Patch8: rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
 
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: json-c-devel
 BuildRequires: libestr-devel >= 0.1.9
+BuildRequires: liblogging-stdlog-devel
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
@@ -252,10 +251,8 @@ of source ports.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
 
 %build
@@ -486,6 +483,11 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Sun May 18 2014 Tomas Heinrich <theinric@redhat.com> 7.4.10-1
+- rebase to 7.4.10
+  - drop patches merged upstream
+  - add a build dependency on liblogging-stdlog
+
 * Thu Apr 24 2014 Tomas Mraz <tmraz@redhat.com> - 7.4.8-2
 - Rebuild for new libgcrypt
 
