@@ -31,6 +31,8 @@ Patch5: rsyslog-7.4.7-numeric-uid.patch
 Patch6: rsyslog-7.4.7-atomicops.patch
 # merged upstream
 Patch8: rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
+# json_tokener_errors is gone in current json-c
+Patch9: rsyslog-7.4.10-json-c-fix.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -254,6 +256,7 @@ of source ports.
 %patch5 -p1
 %patch6 -p1
 %patch8 -p1
+%patch9 -p1 -b .jsonfix
 
 %build
 %ifarch sparc64
@@ -487,6 +490,7 @@ done
 %changelog
 * Mon Aug 04 2014 Tom Callaway <spot@fedoraproject.org> - 7.4.10-3
 - fix license handling
+- fix build against latest json-c
 
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.10-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
