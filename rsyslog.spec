@@ -11,7 +11,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 7.4.10
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -33,6 +33,7 @@ Patch6: rsyslog-7.4.7-atomicops.patch
 Patch8: rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
 # json_tokener_errors is gone in current json-c
 Patch9: rsyslog-7.4.10-json-c-fix.patch
+Patch10: rsyslog-7.4.10-cve-2014-3634.patch
 
 BuildRequires: bison
 BuildRequires: flex
@@ -257,6 +258,7 @@ of source ports.
 %patch6 -p1
 %patch8 -p1
 %patch9 -p1 -b .jsonfix
+%patch10 -p1
 
 %build
 %ifarch sparc64
@@ -488,6 +490,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Oct 07 2014 Tomas Heinrich <theinric@redhat.com> 7.4.10-5
+- fix CVE-2014-3634
+
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.10-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
