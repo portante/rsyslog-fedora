@@ -1,5 +1,6 @@
 %define rsyslog_statedir %{_sharedstatedir}/rsyslog
 %define rsyslog_pkidir %{_sysconfdir}/pki/rsyslog
+%define rsyslog_docdir %{_docdir}/rsyslog
 %if 0%{?rhel} >= 7
 %global want_hiredis 0
 %global want_mongodb 0
@@ -10,32 +11,24 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 7.4.10
-Release: 5%{?dist}
+Version: 8.8.0
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
 Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
+Source1: http://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{version}.tar.gz
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
-Patch0: rsyslog-7.4.1-sd-service.patch
-Patch1: rsyslog-7.2.2-manpage-dbg-mode.patch
+Patch0: rsyslog-8.8.0-sd-service.patch
 # prevent modification of trusted properties (proposed upstream)
-Patch2: rsyslog-7.2.1-msg_c_nonoverwrite_merge.patch
-# merged upstream
-Patch3: rsyslog-7.4.8-imuxsock-wrn.patch
-# merged upstream
-Patch5: rsyslog-7.4.7-numeric-uid.patch
-Patch6: rsyslog-7.4.7-atomicops.patch
-# merged upstream
-Patch8: rsyslog-7.4.8-bz1026804-imjournal-message-loss.patch
-# json_tokener_errors is gone in current json-c
-Patch9: rsyslog-7.4.10-json-c-fix.patch
-Patch10: rsyslog-7.4.10-cve-2014-3634.patch
+Patch1: rsyslog-8.8.0-immutable-json-props.patch
+Patch2: rsyslog-8.8.0-missing-test-data.patch
 
 BuildRequires: bison
+BuildRequires: dos2unix
 BuildRequires: flex
 BuildRequires: json-c-devel
 BuildRequires: libestr-devel >= 0.1.9
@@ -63,7 +56,7 @@ Requires: %name = %version-%release
 BuildRequires: libgcrypt-devel
 
 %package doc
-Summary: Documentation for rsyslog
+Summary: HTML documentation for rsyslog
 Group: Documentation
 
 %package elasticsearch
@@ -89,7 +82,7 @@ Requires: %name = %version-%release
 Summary: Log normalization support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: libestr-devel libee-devel liblognorm-devel
+BuildRequires: libestr-devel libee-devel liblognorm-devel >= 1.0.2
 
 %package mmaudit
 Summary: Message modification module supporting Linux audit format
@@ -249,16 +242,15 @@ spoof the sender address. Also, it enables to circle through a number
 of source ports.
 
 %prep
-%setup -q
+# set up rsyslog-doc sources
+%setup -q -a 1 -T -c
+rm -r LICENSE README.md build.sh source build/objects.inv
+mv build doc
+# set up rsyslog sources
+%setup -q -D
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch5 -p1
-%patch6 -p1
-%patch8 -p1
-%patch9 -p1 -b .jsonfix
-%patch10 -p1
 
 %build
 %ifarch sparc64
@@ -278,7 +270,6 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 %configure \
 	--prefix=/usr \
 	--disable-static \
-	--disable-testbench \
 	--enable-elasticsearch \
 	--enable-gnutls \
 	--enable-gssapi-krb5 \
@@ -291,6 +282,7 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 	--enable-mail \
 	--enable-mmanon \
 	--enable-mmaudit \
+	--enable-mmcount \
 	--enable-mmjsonparse \
 	--enable-mmnormalize \
 	--enable-mmsnmptrapd \
@@ -315,31 +307,45 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 	--enable-pmsnare \
 	--enable-relp \
 	--enable-snmp \
+	--enable-testbench \
 	--enable-unlimited-select \
 	--enable-usertools \
 
-make
+make V=1
+
+# small portion of the test suite seems to be consistently failing (this is more severe on arm*)
+# there are also some random failures (~1 test out of the whole batch) on i686 and x86_64
+# thus the test suite is disabled for now until these issues are sorted out
+%check
+%if 0
+make V=1 check
+%endif
 
 %install
-make DESTDIR=%{buildroot} install
+make V=1 DESTDIR=%{buildroot} install
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
 install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/rsyslog.d
 install -d -m 700 %{buildroot}%{rsyslog_statedir}
 install -d -m 700 %{buildroot}%{rsyslog_pkidir}
+install -d -m 755 %{buildroot}%{rsyslog_docdir}/html
 
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rsyslog.conf
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/rsyslog
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
-
-# get rid of *.la
+install -p -m 644 plugins/ommysql/createDB.sql %{buildroot}%{rsyslog_docdir}/mysql-createDB.sql
+install -p -m 644 plugins/ompgsql/createDB.sql %{buildroot}%{rsyslog_docdir}/pgsql-createDB.sql
+dos2unix tools/recover_qi.pl
+install -p -m 644 tools/recover_qi.pl %{buildroot}%{rsyslog_docdir}/recover_qi.pl
+# extract documentation
+cp -r doc/* %{buildroot}%{rsyslog_docdir}/html
+# get rid of libtool libraries
 rm -f %{buildroot}%{_libdir}/rsyslog/*.la
 # get rid of socket activation by default
 sed -i '/^Alias/s/^/;/;/^Requires=syslog.socket/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
-
-# convert line endings from "\r\n" to "\n"
-cat tools/recover_qi.pl | tr -d '\r' > %{buildroot}%{_bindir}/rsyslog-recover-qi.pl
+# imdiag is only used for testing
+rm -f %{buildroot}%{_libdir}/rsyslog/imdiag.so
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -359,13 +365,15 @@ done
 %defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
 %license COPYING*
-%doc AUTHORS NEWS README ChangeLog
+%doc AUTHORS ChangeLog README.md
+%exclude %{rsyslog_docdir}/html
+%exclude %{rsyslog_docdir}/mysql-createDB.sql
+%exclude %{rsyslog_docdir}/pgsql-createDB.sql
 %dir %{_libdir}/rsyslog
 %dir %{_sysconfdir}/rsyslog.d
 %dir %{rsyslog_statedir}
 %dir %{rsyslog_pkidir}
 %{_sbindir}/rsyslogd
-%attr(755,root,root) %{_bindir}/rsyslog-recover-qi.pl
 %{_mandir}/man5/rsyslog.conf.5.gz
 %{_mandir}/man8/rsyslogd.8.gz
 %{_unitdir}/rsyslog.service
@@ -373,7 +381,6 @@ done
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 # plugins
-%{_libdir}/rsyslog/imdiag.so
 %{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imjournal.so
 %{_libdir}/rsyslog/imklog.so
@@ -392,17 +399,17 @@ done
 %{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmzlibw.so
 %{_libdir}/rsyslog/mmanon.so
+%{_libdir}/rsyslog/mmcount.so
+%{_libdir}/rsyslog/mmexternal.so
 %{_libdir}/rsyslog/omjournal.so
 %{_libdir}/rsyslog/ommail.so
 %{_libdir}/rsyslog/omprog.so
-%{_libdir}/rsyslog/omruleset.so
 %{_libdir}/rsyslog/omstdout.so
 %{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/omuxsock.so
 %{_libdir}/rsyslog/pmaixforwardedfrom.so
 %{_libdir}/rsyslog/pmcisconames.so
 %{_libdir}/rsyslog/pmlastmsg.so
-%{_libdir}/rsyslog/pmrfc3164sd.so
 %{_libdir}/rsyslog/pmsnare.so
 
 %files crypto
@@ -413,7 +420,7 @@ done
 
 %files doc
 %defattr(-,root,root)
-%doc doc/*html
+%doc %{rsyslog_docdir}/html
 
 %files elasticsearch
 %defattr(-,root,root)
@@ -447,7 +454,7 @@ done
 
 %files mysql
 %defattr(-,root,root)
-%doc plugins/ommysql/createDB.sql
+%doc %{rsyslog_docdir}/mysql-createDB.sql
 %{_libdir}/rsyslog/ommysql.so
 
 %if %{want_mongodb}
@@ -459,7 +466,7 @@ done
 
 %files pgsql
 %defattr(-,root,root)
-%doc plugins/ompgsql/createDB.sql
+%doc %{rsyslog_docdir}/pgsql-createDB.sql
 %{_libdir}/rsyslog/ompgsql.so
 
 %files rabbitmq
@@ -490,6 +497,30 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Thu Mar 19 2015 Tomas Heinrich <theinric@redhat.com> 8.8.0-1
+- rebase to 8.8.0
+  resolves: rhbz#1069690
+  - drop patches merged upstream
+  - version the dependency on liblognorm-devel
+  - enable mmcount, mmexternal modules,
+    remove imdiag, omruleset and pmrfc3164sd modules
+    resolves: rhbz#1156359
+- add dos2unix to build requirements
+- make the build process more verbose
+- in accordance with an upstream change, the rsyslog service is now
+  restarted automatically upon failure
+- adjust the default configuration file for the removal of
+  /etc/rsyslog.d/listen.conf by the systemd package
+  resolves: rhbz#1116864
+- disable the imklog module by default; kernel messages are read from journald
+  resolves: rhbz#1083564
+- if there is no saved position in the journal, log only messages that are
+  received after rsyslog is started; this is a safety measure to prevent
+  excessive resource utilization
+- use documentation from the standalone rsyslog-docs project
+- move documentation from all subpackages into a single directory
+- mark the recover_qi.pl script as documentation
+
 * Tue Oct 07 2014 Tomas Heinrich <theinric@redhat.com> 7.4.10-5
 - fix CVE-2014-3634
 
