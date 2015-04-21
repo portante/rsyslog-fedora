@@ -12,7 +12,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 8.8.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -499,6 +499,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Apr 21 2015 Remi Collet <remi@fedoraproject.org> 8.8.0-3
+- rebuild for new librabbitmq
+
 * Fri Mar 20 2015 Tomas Heinrich <theinric@redhat.com> 8.8.0-2
 - add a patch to fix default syslog priority assigned to journal
   messages which have none
