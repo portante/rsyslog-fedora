@@ -12,7 +12,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 8.8.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -499,6 +499,9 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Tue Apr 21 2015 Remi Collet <remi@fedoraproject.org> 8.8.0-3
 - rebuild for new librabbitmq
 
