@@ -11,8 +11,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 8.8.0
-Release: 4%{?dist}
+Version: 8.10.0
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -26,7 +26,6 @@ Patch0: rsyslog-8.8.0-sd-service.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch1: rsyslog-8.8.0-immutable-json-props.patch
 Patch2: rsyslog-8.8.0-missing-test-data.patch
-Patch3: rsyslog-8.8.0-imjournal-dflt-pri.patch
 
 BuildRequires: bison
 BuildRequires: dos2unix
@@ -252,7 +251,6 @@ mv build doc
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %build
 %ifarch sparc64
@@ -499,6 +497,10 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Wed Jun 24 2015 Tomas Heinrich <theinric@redhat.com> 8.10.0-1
+- rebase to 8.10.0
+- drop patches merged upstream
+
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.8.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
