@@ -504,6 +504,8 @@ done
   resolves: rhbz#1224972
 - make logrotate tolerate missing log files
   resolves: rhbz#1205889
+- set the default service umask to 0066
+  resolves: rhbz#1228192
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.8.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
