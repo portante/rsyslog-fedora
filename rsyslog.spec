@@ -26,6 +26,8 @@ Patch0: rsyslog-8.8.0-sd-service.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch1: rsyslog-8.8.0-immutable-json-props.patch
 Patch2: rsyslog-8.8.0-missing-test-data.patch
+# https://github.com/rsyslog/rsyslog/pull/412
+Patch3: rsyslog-8.10.0-imjournal-empty-messages.patch
 
 BuildRequires: bison
 BuildRequires: dos2unix
@@ -251,6 +253,7 @@ mv build doc
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %ifarch sparc64
@@ -508,6 +511,8 @@ done
   resolves: rhbz#1228192
 - use systemctl for sending SIGHUP to the service
   related: rhbz#1224972
+- add a patch to prevent a crash on empty messages
+  resolves: rhbz#1224538
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.8.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
