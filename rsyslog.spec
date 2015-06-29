@@ -28,6 +28,8 @@ Patch1: rsyslog-8.8.0-immutable-json-props.patch
 Patch2: rsyslog-8.8.0-missing-test-data.patch
 # https://github.com/rsyslog/rsyslog/pull/412
 Patch3: rsyslog-8.10.0-imjournal-empty-messages.patch
+# https://github.com/rsyslog/rsyslog/pull/413
+Patch4: rsyslog-8.10.0-resetconfigvariables.patch
 
 BuildRequires: bison
 BuildRequires: dos2unix
@@ -254,6 +256,7 @@ mv build doc
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %ifarch sparc64
@@ -513,6 +516,8 @@ done
   related: rhbz#1224972
 - add a patch to prevent a crash on empty messages
   resolves: rhbz#1224538
+- add a patch to fix several default parameters for message queues
+  resolves: rhbz#1205696
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.8.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
