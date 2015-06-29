@@ -1,0 +1,27 @@
+From 20912054d062137a35a82962db7e53e1de2b819d Mon Sep 17 00:00:00 2001
+From: Tomas Heinrich <theinric@redhat.com>
+Date: Tue, 23 Jun 2015 13:48:43 +0200
+Subject: [PATCH 3/4] imfile: fix type overflow
+
+Data type of a configuration variable wasn't big enough for
+eCmdHdlrSize.
+---
+ plugins/imfile/imfile.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/imfile/imfile.c b/plugins/imfile/imfile.c
+index e3d0884..7e5ec62 100644
+--- a/plugins/imfile/imfile.c
++++ b/plugins/imfile/imfile.c
+@@ -128,7 +128,7 @@ static struct configSettings_s {
+ 	int iFacility; /* local0 */
+ 	int iSeverity;  /* notice, as of rfc 3164 */
+ 	int readMode;  /* mode to use for ReadMultiLine call */
+-	int maxLinesAtOnce;	/* how many lines to process in a row? */
++	int64 maxLinesAtOnce;	/* how many lines to process in a row? */
+ 	ruleset_t *pBindRuleset;	/* ruleset to bind listener to (use system default if unspecified) */
+ } cs;
+ 
+-- 
+1.9.3
+
