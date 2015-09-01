@@ -11,7 +11,7 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 8.10.0
+Version: 8.12.0
 Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
@@ -25,20 +25,19 @@ Source4: rsyslog.log
 Patch0: rsyslog-8.8.0-sd-service.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch1: rsyslog-8.8.0-immutable-json-props.patch
-Patch2: rsyslog-8.8.0-missing-test-data.patch
-# https://github.com/rsyslog/rsyslog/pull/412
-Patch3: rsyslog-8.10.0-imjournal-empty-messages.patch
-# https://github.com/rsyslog/rsyslog/pull/413
-Patch4: rsyslog-8.10.0-resetconfigvariables.patch
-# https://github.com/rsyslog/rsyslog/pull/391
-Patch5: rsyslog-8.10.0-imfile-maxlinesatonce.patch
+# Fix detection of the GnuTLS package 
+# https://github.com/rsyslog/rsyslog/pull/476
+Patch2: rsyslog-8.12.0-gnutls-detection.patch
 
+BuildRequires: autoconf
+BuildRequires: automake
 BuildRequires: bison
 BuildRequires: dos2unix
 BuildRequires: flex
 BuildRequires: json-c-devel
 BuildRequires: libestr-devel >= 0.1.9
 BuildRequires: liblogging-stdlog-devel
+BuildRequires: libtool
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
@@ -257,9 +256,8 @@ mv build doc
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+
+autoreconf -iv
 
 %build
 %ifarch sparc64
@@ -280,6 +278,7 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 	--prefix=/usr \
 	--disable-static \
 	--enable-elasticsearch \
+	--enable-generate-man-pages \
 	--enable-gnutls \
 	--enable-gssapi-krb5 \
 	--enable-imdiag \
@@ -375,6 +374,7 @@ done
 %{!?_licensedir:%global license %%doc}
 %license COPYING*
 %doc AUTHORS ChangeLog README.md
+%{rsyslog_docdir}
 %exclude %{rsyslog_docdir}/html
 %exclude %{rsyslog_docdir}/mysql-createDB.sql
 %exclude %{rsyslog_docdir}/pgsql-createDB.sql
@@ -506,6 +506,15 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Tue Sep 1 2015 Radovan Sroka <rsroka@redhat.com> 8.12.0-1
+- rebase to 8.12.0
+  - drop patches merged upstream
+- resolve detection of the new GnuTLS package
+  - add autoconf to BuildRequires
+- add --enable-generate-man-pages to configure parameters;
+  the rscryutil man page isn't generated without it
+  https://github.com/rsyslog/rsyslog/pull/469
+
 * Wed Jun 24 2015 Tomas Heinrich <theinric@redhat.com> 8.10.0-1
 - rebase to 8.10.0
 - drop patches merged upstream
