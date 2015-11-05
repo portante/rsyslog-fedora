@@ -99,6 +99,11 @@ Summary: Message modification module for snmptrapd generated messages
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 
+%package mmutf8fix
+Summary: Message modification module encoding messages in UTF-8
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
 %package libdbi
 Summary: Libdbi database support for rsyslog
 Group: System Environment/Daemons
@@ -200,6 +205,10 @@ in various settings.
 This message modification module takes messages generated from snmptrapd and
 modifies them so that they look like they originated from the read originator.
 
+%description mmutf8fix
+This module provides message modification supporting encoding messages in
+UTF-8.
+
 %description libdbi
 This module supports a large number of database systems via
 libdbi. Libdbi abstracts the database layer and provides drivers for
@@ -294,6 +303,7 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 	--enable-mmjsonparse \
 	--enable-mmnormalize \
 	--enable-mmsnmptrapd \
+	--enable-mmutf8fix \
 	--enable-mysql \
 %if %{want_hiredis}
 	--enable-omhiredis \
@@ -311,7 +321,6 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 	--enable-pmaixforwardedfrom \
 	--enable-pmcisconames \
 	--enable-pmlastmsg \
-	--enable-pmrfc3164sd \
 	--enable-pmsnare \
 	--enable-relp \
 	--enable-snmp \
@@ -410,6 +419,7 @@ done
 %{_libdir}/rsyslog/mmanon.so
 %{_libdir}/rsyslog/mmcount.so
 %{_libdir}/rsyslog/mmexternal.so
+%{_libdir}/rsyslog/mmutf8fix.so
 %{_libdir}/rsyslog/omjournal.so
 %{_libdir}/rsyslog/ommail.so
 %{_libdir}/rsyslog/omprog.so
@@ -460,6 +470,10 @@ done
 %files mmsnmptrapd
 %defattr(-,root,root)
 %{_libdir}/rsyslog/mmsnmptrapd.so
+
+%files mmutf8fix
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmutf8fix.so
 
 %files mysql
 %defattr(-,root,root)
