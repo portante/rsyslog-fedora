@@ -25,9 +25,6 @@ Source4: rsyslog.log
 Patch0: rsyslog-8.8.0-sd-service.patch
 # prevent modification of trusted properties (proposed upstream)
 Patch1: rsyslog-8.8.0-immutable-json-props.patch
-# Fix detection of the GnuTLS package 
-# https://github.com/rsyslog/rsyslog/pull/476
-Patch2: rsyslog-8.12.0-gnutls-detection.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -264,7 +261,6 @@ mv build doc
 %setup -q -D
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 autoreconf -iv
 
