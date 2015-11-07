@@ -11,8 +11,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 8.12.0
-Release: 3%{?dist}
+Version: 8.14.0
+Release: 0%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -32,16 +32,26 @@ BuildRequires: bison
 BuildRequires: dos2unix
 BuildRequires: flex
 BuildRequires: json-c-devel
+BuildRequires: curl-devel
+BuildRequires: libgt-devel
 BuildRequires: libestr-devel >= 0.1.9
+BuildRequires: libee-devel
 BuildRequires: liblogging-stdlog-devel
 BuildRequires: libtool
 BuildRequires: libuuid-devel
 BuildRequires: pkgconfig
 BuildRequires: python-docutils
+%if 0%{?rhel} >= 6
+#Requires: libksi
+BuildRequires: libksi-devel
+	%if %{?rhel} >= 7
 # make sure systemd is in a version that isn't affected by rhbz#974132
 BuildRequires: systemd-devel >= 204-8
+	%endif
+%endif
 BuildRequires: zlib-devel
 
+Requires: libgt
 Requires: logrotate >= 3.5.2
 Requires: bash >= 2.0
 Requires(post): systemd
@@ -84,7 +94,7 @@ Requires: %name = %version-%release
 Summary: Log normalization support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: libestr-devel libee-devel liblognorm-devel >= 1.0.2
+BuildRequires: libestr-devel libee-devel liblognorm-devel >= 1.1.2
 
 %package mmaudit
 Summary: Message modification module supporting Linux audit format
@@ -516,6 +526,12 @@ done
 %{_libdir}/rsyslog/omudpspoof.so
 
 %changelog
+* Fri Mar 24 2016 Peter Portante <pportant@redhat.com> 8.14.0
+- rebase to 8.14.0
+  - drop unused patches
+  - add mmutf8fix packaging
+  - bump liblognorm version requirement to 1.1.2
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 8.12.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
