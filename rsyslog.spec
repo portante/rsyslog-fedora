@@ -1,7 +1,7 @@
 %define rsyslog_statedir %{_sharedstatedir}/rsyslog
 %define rsyslog_pkidir %{_sysconfdir}/pki/rsyslog
 %define rsyslog_docdir %{_docdir}/rsyslog
-%if 0%{?rhel} >= 7
+%if 0%{?fedora}0%{?rhel} >= 7
 %global want_hiredis 0
 %global want_mongodb 0
 %else
@@ -31,23 +31,22 @@ BuildRequires: automake
 BuildRequires: bison
 BuildRequires: dos2unix
 BuildRequires: flex
+BuildRequires: libtool
+BuildRequires: pkgconfig
+BuildRequires: libestr-devel >= 0.1.9
+BuildRequires: libee-devel
 BuildRequires: json-c-devel
 BuildRequires: curl-devel
 BuildRequires: libgt-devel
-BuildRequires: libestr-devel >= 0.1.9
-BuildRequires: libee-devel
-BuildRequires: liblogging-stdlog-devel
-BuildRequires: libtool
-BuildRequires: libuuid-devel
-BuildRequires: pkgconfig
 BuildRequires: python-docutils
-%if 0%{?rhel} >= 6
+BuildRequires: liblogging-stdlog-devel
+%if 0%{?fedora}0%{?rhel}>= 6
 #Requires: libksi
 BuildRequires: libksi-devel
-	%if %{?rhel} >= 7
+    %if 0%{?fedora}%{?rhel}>= 7
 # make sure systemd is in a version that isn't affected by rhbz#974132
 BuildRequires: systemd-devel >= 204-8
-	%endif
+    %endif
 %endif
 BuildRequires: zlib-devel
 
@@ -61,56 +60,6 @@ Requires(postun): systemd
 Provides: syslog
 Obsoletes: sysklogd < 1.5-11
 
-%package crypto
-Summary: Encryption support
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: libgcrypt-devel
-
-%package doc
-Summary: HTML documentation for rsyslog
-Group: Documentation
-
-%package elasticsearch
-Summary: ElasticSearch output module for rsyslog
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: libcurl-devel
-
-%if %{want_hiredis}
-%package hiredis
-Summary: Redis support for rsyslog
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: hiredis-devel
-%endif
-
-%package mmjsonparse
-Summary: JSON enhanced logging support
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-
-%package mmnormalize
-Summary: Log normalization support for rsyslog
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: libestr-devel libee-devel liblognorm-devel >= 1.1.2
-
-%package mmaudit
-Summary: Message modification module supporting Linux audit format
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-
-%package mmsnmptrapd
-Summary: Message modification module for snmptrapd generated messages
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-
-%package mmutf8fix
-Summary: Message modification module encoding messages in UTF-8
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-
 %package libdbi
 Summary: Libdbi database support for rsyslog
 Group: System Environment/Daemons
@@ -123,25 +72,11 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: mysql-devel >= 4.0
 
-%if %{want_mongodb}
-%package mongodb
-Summary: MongoDB support for rsyslog
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: libmongo-client-devel
-%endif
-
 %package pgsql
 Summary: PostgresSQL support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: postgresql-devel
-
-%package rabbitmq
-Summary: RabbitMQ support for rsyslog
-Group: System Environment/Daemons
-Requires: %name = %version-%release
-BuildRequires: librabbitmq-devel >= 0.2
 
 %package gssapi
 Summary: GSSAPI authentication and encryption support for rsyslog
@@ -153,13 +88,16 @@ BuildRequires: krb5-devel
 Summary: RELP protocol support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
-BuildRequires: librelp-devel >= 1.0.3
+Requires: librelp >= 1.1.1
+BuildRequires: librelp-devel >= 1.1.1
+BuildRequires: libgcrypt-devel
 
 %package gnutls
 Summary: TLS protocol support for rsyslog
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: gnutls-devel
+BuildRequires: libgcrypt-devel
 
 %package snmp
 Summary: SNMP protocol support for rsyslog
@@ -173,6 +111,104 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: libnet-devel
 
+%package mmjsonparse
+Summary: JSON enhanced logging support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: liblognorm-devel >= 1.1.2
+
+%package mmnormalize
+Summary: Log normalization support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: liblognorm-devel >= 1.1.2
+
+%package mmfields
+Summary: mmfields support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: liblognorm-devel >= 1.1.2
+
+%package pmaixforwardedfrom
+Summary: pmaixforwardedfrom support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package mmanon
+Summary: mmanon support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package mmutf8fix
+Summary: Message modification module encoding messages in UTF-8
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package ommail
+Summary: Mail support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package pmciscoios
+Summary: pmciscoios support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package elasticsearch
+Summary: ElasticSearch output module for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libuuid-devel
+BuildRequires: libcurl-devel
+
+%if %{want_mongodb}
+%package mongodb
+Summary: MongoDB support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libmongo-client-devel
+%endif
+
+%package kafka
+Summary: Kafka output support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: adiscon-librdkafka-devel
+
+%if %{want_hiredis}
+%package hiredis
+Summary: Redis support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: hiredis-devel
+%endif
+
+%package mmaudit
+Summary: Message modification module supporting Linux audit format
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package mmsnmptrapd
+Summary: Message modification module for snmptrapd generated messages
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
+%package rabbitmq
+Summary: RabbitMQ support for rsyslog
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: librabbitmq-devel >= 0.2
+
+%package crypto
+Summary: Encryption support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: libgcrypt-devel
+
+%package doc
+Summary: HTML documentation for rsyslog
+Group: Documentation
+
 %description
 Rsyslog is an enhanced, multi-threaded syslog daemon. It supports MySQL,
 syslog/TCP, RFC 3195, permitted sender lists, filtering on any message part,
@@ -180,41 +216,6 @@ and fine grain output format control. It is compatible with stock sysklogd
 and can be used as a drop-in replacement. Rsyslog is simple to set up, with
 advanced features suitable for enterprise-class, encryption-protected syslog
 relay chains.
-
-%description crypto
-This package contains a module providing log file encryption and a
-command line tool to process encrypted logs.
-
-%description doc
-This subpackage contains documentation for rsyslog.
-
-%description elasticsearch
-This module provides the capability for rsyslog to feed logs directly into
-Elasticsearch.
-
-%if %{want_hiredis}
-%description hiredis
-This module provides output to Redis.
-%endif
-
-%description mmjsonparse
-This module provides the capability to recognize and parse JSON enhanced
-syslog messages.
-
-%description mmnormalize
-This module provides the capability to normalize log messages via liblognorm.
-
-%description mmaudit
-This module provides message modification supporting Linux audit format
-in various settings.
-
-%description mmsnmptrapd
-This message modification module takes messages generated from snmptrapd and
-modifies them so that they look like they originated from the read originator.
-
-%description mmutf8fix
-This module provides message modification supporting encoding messages in
-UTF-8.
 
 %description libdbi
 This module supports a large number of database systems via
@@ -225,18 +226,9 @@ many systems. Drivers are available via the libdbi-drivers project.
 The rsyslog-mysql package contains a dynamic shared object that will add
 MySQL database support to rsyslog.
 
-%if %{want_mongodb}
-%description mongodb
-The rsyslog-mongodb package contains a dynamic shared object that will add
-MongoDB database support to rsyslog.
-%endif
-
 %description pgsql
 The rsyslog-pgsql package contains a dynamic shared object that will add
 PostgreSQL database support to rsyslog.
-
-%description rabbitmq
-This module allows rsyslog to send messages to a RabbitMQ server.
 
 %description gssapi
 The rsyslog-gssapi package contains the rsyslog plugins which support GSSAPI
@@ -262,6 +254,80 @@ This module is similar to the regular UDP forwarder, but permits to
 spoof the sender address. Also, it enables to circle through a number
 of source ports.
 
+%description mmjsonparse
+This module provides the capability to recognize and parse JSON enhanced
+syslog messages.
+
+%description mmnormalize
+This module provides the capability to normalize log messages via liblognorm.
+
+%description mmfields
+Parse all fields of the message into structured data inside the JSON tree.
+
+%description pmaixforwardedfrom
+This module cleans up messages forwarded from AIX.
+Instead of actually parsing the message, this modifies the message and then
+falls through to allow a later parser to handle the now modified message.
+
+%description mmanon
+IP Address Anonimization Module (mmanon).
+It is a message modification module that actually changes the IP address
+inside the message, so after calling mmanon, the original message can
+no longer be obtained. Note that anonymization will break digital
+signatures on the message, if they exist.
+
+%description mmutf8fix
+This module provides support for fixing invalid UTF-8 sequences. Most often, such invalid sequences result from syslog sources sending in non-UTF character sets, e.g. ISO 8859. As syslog does not have a way to convey the character set information, these sequences are not properly handled.
+
+%description pmciscoios
+Parser module which supports various Cisco IOS formats.
+
+%description ommail
+Mail Output Module.
+This module supports sending syslog messages via mail. Each syslog message
+is sent via its own mail. The ommail plugin is primarily meant for alerting users.
+As such, it is assume that mails will only be sent in an extremely
+limited number of cases.
+
+%description elasticsearch
+This module provides the capability for rsyslog to feed logs directly into
+ElasticSearch.
+
+%if %{want_mongodb}
+%description mongodb
+The rsyslog-mongodb package contains a dynamic shared object that will add
+MongoDB database support to rsyslog.
+%endif
+
+%description kafka
+librdkafka is a C library implementation of the Apache Kafka protocol,
+containing both Producer and Consumer support. It was designed with message delivery
+reliability and high performance in mind, current figures exceed 800000 msgs/second
+for the producer and 3 million msgs/second for the consumer.
+
+%if %{want_hiredis}
+%description hiredis
+This module provides output to Redis.
+%endif
+
+%description mmaudit
+This module provides message modification supporting Linux audit format
+in various settings.
+
+%description mmsnmptrapd
+This message modification module takes messages generated from snmptrapd and
+modifies them so that they look like they originated from the read originator.
+
+%description rabbitmq
+This module allows rsyslog to send messages to a RabbitMQ server.
+
+%description crypto
+This package contains a module providing log file encryption and a
+command line tool to process encrypted logs.
+
+%description doc
+This subpackage contains documentation for rsyslog.
+
 %prep
 # set up rsyslog-doc sources
 %setup -q -a 1 -T -c
@@ -277,10 +343,10 @@ autoreconf -iv
 %build
 %ifarch sparc64
 #sparc64 need big PIE
-export CFLAGS="$RPM_OPT_FLAGS -fPIE -DPATH_PIDFILE=\\\"/var/run/syslogd.pid\\\""
+export CFLAGS="$RPM_OPT_FLAGS -fPIE -DSYSLOGD_PIDNAME=\\\"/var/run/syslogd.pid\\\" -std=c99"
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %else
-export CFLAGS="$RPM_OPT_FLAGS -fpie -DPATH_PIDFILE=\\\"/var/run/syslogd.pid\\\""
+export CFLAGS="$RPM_OPT_FLAGS -fpie -DSYSLOGD_PIDNAME=\\\"/var/run/syslogd.pid\\\" -std=c99"
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %endif
 
@@ -290,49 +356,58 @@ export HIREDIS_CFLAGS=-I/usr/include/hiredis
 export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 %endif
 %configure \
-	--prefix=/usr \
-	--disable-static \
-	--enable-elasticsearch \
-	--enable-generate-man-pages \
-	--enable-gnutls \
-	--enable-gssapi-krb5 \
-	--enable-imdiag \
-	--enable-imfile \
-	--enable-imjournal \
-	--enable-impstats \
-	--enable-imptcp \
-	--enable-libdbi \
-	--enable-mail \
-	--enable-mmanon \
-	--enable-mmaudit \
-	--enable-mmcount \
-	--enable-mmjsonparse \
-	--enable-mmnormalize \
-	--enable-mmsnmptrapd \
-	--enable-mmutf8fix \
-	--enable-mysql \
-%if %{want_hiredis}
-	--enable-omhiredis \
-%endif
-	--enable-omjournal \
+        --prefix=/usr \
+        --disable-static \
+        --disable-testbench \
+        --enable-uuid \
+        --enable-elasticsearch \
 %if %{want_mongodb}
-	--enable-ommongodb \
+        --enable-ommongodb \
 %endif
-	--enable-omprog \
-	--enable-omrabbitmq \
-	--enable-omstdout \
-	--enable-omudpspoof \
-	--enable-omuxsock \
-	--enable-pgsql \
-	--enable-pmaixforwardedfrom \
-	--enable-pmcisconames \
-	--enable-pmlastmsg \
-	--enable-pmsnare \
-	--enable-relp \
-	--enable-snmp \
-	--enable-testbench \
-	--enable-unlimited-select \
-	--enable-usertools \
+        --enable-omkafka \
+        --enable-usertools \
+        --enable-gt-ksi \
+        --enable-imjournal \
+        --enable-omjournal \
+        --enable-generate-man-pages \
+        --enable-gnutls \
+        --enable-imfile \
+        --enable-impstats \
+        --enable-imptcp \
+        --enable-libdbi \
+        --enable-mail \
+        --enable-mysql \
+        --enable-omprog \
+        --enable-omudpspoof \
+        --enable-omuxsock \
+        --enable-pgsql \
+        --enable-pmlastmsg \
+        --enable-relp \
+        --enable-snmp \
+        --enable-unlimited-select \
+        --enable-mmjsonparse \
+        --enable-mmnormalize \
+        --enable-mmanon \
+        --enable-mmutf8fix \
+        --enable-mail \
+        --enable-mmfields \
+        --enable-mmpstrucdata \
+        --enable-mmsequence \
+        --enable-pmaixforwardedfrom \
+        --enable-pmciscoios \
+        --enable-guardtime \
+        --enable-gssapi-krb5 \
+        --enable-imdiag \
+        --enable-mmaudit \
+        --enable-mmcount \
+        --enable-mmsnmptrapd \
+%if %{want_hiredis}
+        --enable-omhiredis \
+%endif
+        --enable-omrabbitmq \
+        --enable-omstdout \
+        --enable-pmcisconames \
+        --enable-pmsnare \
 
 make V=1
 
@@ -373,8 +448,8 @@ rm -f %{buildroot}%{_libdir}/rsyslog/imdiag.so
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
 do
-	[ -f $n ] && continue
-	umask 066 && touch $n
+    [ -f $n ] && continue
+    umask 066 && touch $n
 done
 %systemd_post rsyslog.service
 
@@ -398,23 +473,24 @@ done
 %dir %{rsyslog_statedir}
 %dir %{rsyslog_pkidir}
 %{_sbindir}/rsyslogd
+%{_bindir}/rsgtutil
 %{_mandir}/man5/rsyslog.conf.5.gz
 %{_mandir}/man8/rsyslogd.8.gz
+%{_mandir}/man1/rsgtutil.1.gz
 %{_unitdir}/rsyslog.service
 %config(noreplace) %{_sysconfdir}/rsyslog.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
 %config(noreplace) %{_sysconfdir}/logrotate.d/syslog
 # plugins
 %{_libdir}/rsyslog/imfile.so
-%{_libdir}/rsyslog/imjournal.so
 %{_libdir}/rsyslog/imklog.so
 %{_libdir}/rsyslog/immark.so
 %{_libdir}/rsyslog/impstats.so
 %{_libdir}/rsyslog/imptcp.so
 %{_libdir}/rsyslog/imtcp.so
 %{_libdir}/rsyslog/imudp.so
-%{_libdir}/rsyslog/imuxsock.so
 %{_libdir}/rsyslog/lmnet.so
+%{_libdir}/rsyslog/imuxsock.so
 %{_libdir}/rsyslog/lmnetstrms.so
 %{_libdir}/rsyslog/lmnsd_ptcp.so
 %{_libdir}/rsyslog/lmregexp.so
@@ -422,85 +498,40 @@ done
 %{_libdir}/rsyslog/lmtcpclt.so
 %{_libdir}/rsyslog/lmtcpsrv.so
 %{_libdir}/rsyslog/lmzlibw.so
-%{_libdir}/rsyslog/mmanon.so
-%{_libdir}/rsyslog/mmcount.so
-%{_libdir}/rsyslog/mmexternal.so
-%{_libdir}/rsyslog/mmutf8fix.so
-%{_libdir}/rsyslog/omjournal.so
+%{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/ommail.so
 %{_libdir}/rsyslog/omprog.so
-%{_libdir}/rsyslog/omstdout.so
-%{_libdir}/rsyslog/omtesting.so
 %{_libdir}/rsyslog/omuxsock.so
+%{_libdir}/rsyslog/pmlastmsg.so
+%{_libdir}/rsyslog/lmcry_gcry.so
+%{_libdir}/rsyslog/lmsig_gt.so
+%{_libdir}/rsyslog/mmpstrucdata.so
+%{_libdir}/rsyslog/mmsequence.so
+%{_libdir}/rsyslog/mmexternal.so
+%{_libdir}/rsyslog/imjournal.so
+%{_libdir}/rsyslog/omjournal.so
+%{_libdir}/rsyslog/lmsig_ksi.so
+%{_libdir}/rsyslog/mmanon.so
+%{_libdir}/rsyslog/mmcount.so
+%{_libdir}/rsyslog/mmutf8fix.so
+%{_libdir}/rsyslog/omstdout.so
 %{_libdir}/rsyslog/pmaixforwardedfrom.so
 %{_libdir}/rsyslog/pmcisconames.so
-%{_libdir}/rsyslog/pmlastmsg.so
 %{_libdir}/rsyslog/pmsnare.so
-
-%files crypto
-%defattr(-,root,root)
-%{_bindir}/rscryutil
-%{_mandir}/man1/rscryutil.1.gz
-%{_libdir}/rsyslog/lmcry_gcry.so
-
-%files doc
-%defattr(-,root,root)
-%doc %{rsyslog_docdir}/html
-
-%files elasticsearch
-%defattr(-,root,root)
-%{_libdir}/rsyslog/omelasticsearch.so
-
-%if %{want_hiredis}
-%files hiredis
-%defattr(-,root,root)
-%{_libdir}/rsyslog/omhiredis.so
-%endif
 
 %files libdbi
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omlibdbi.so
-
-%files mmaudit
-%defattr(-,root,root)
-%{_libdir}/rsyslog/mmaudit.so
-
-%files mmjsonparse
-%defattr(-,root,root)
-%{_libdir}/rsyslog/mmjsonparse.so
-
-%files mmnormalize
-%defattr(-,root,root)
-%{_libdir}/rsyslog/mmnormalize.so
-
-%files mmsnmptrapd
-%defattr(-,root,root)
-%{_libdir}/rsyslog/mmsnmptrapd.so
-
-%files mmutf8fix
-%defattr(-,root,root)
-%{_libdir}/rsyslog/mmutf8fix.so
 
 %files mysql
 %defattr(-,root,root)
 %doc %{rsyslog_docdir}/mysql-createDB.sql
 %{_libdir}/rsyslog/ommysql.so
 
-%if %{want_mongodb}
-%files mongodb
-%defattr(-,root,root)
-%{_bindir}/logctl
-%{_libdir}/rsyslog/ommongodb.so
-%endif
-
 %files pgsql
 %defattr(-,root,root)
 %doc %{rsyslog_docdir}/pgsql-createDB.sql
 %{_libdir}/rsyslog/ompgsql.so
-
-%files rabbitmq
-%defattr(-,root,root)
-%{_libdir}/rsyslog/omrabbitmq.so
 
 %files gssapi
 %defattr(-,root,root)
@@ -524,6 +555,82 @@ done
 %files udpspoof
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omudpspoof.so
+
+%files mmjsonparse
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmjsonparse.so
+
+%files mmnormalize
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmnormalize.so
+
+%files mmfields
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmfields.so
+
+%files pmaixforwardedfrom
+%defattr(-,root,root)
+%{_libdir}/rsyslog/pmaixforwardedfrom.so
+
+%files mmanon
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmanon.so
+
+%files pmciscoios
+%defattr(-,root,root)
+%{_libdir}/rsyslog/pmciscoios.so
+
+%files mmutf8fix
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmutf8fix.so
+
+%files ommail
+%defattr(-,root,root)
+%{_libdir}/rsyslog/ommail.so
+
+%files elasticsearch
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omelasticsearch.so
+
+%if %{want_mongodb}
+%files mongodb
+%defattr(-,root,root)
+%{_libdir}/rsyslog/ommongodb.so
+%{_bindir}/logctl
+%endif
+
+%files kafka
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omkafka.so
+
+%if %{want_hiredis}
+%files hiredis
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omhiredis.so
+%endif
+
+%files mmaudit
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmaudit.so
+
+%files mmsnmptrapd
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmsnmptrapd.so
+
+%files rabbitmq
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omrabbitmq.so
+
+%files crypto
+%defattr(-,root,root)
+%{_bindir}/rscryutil
+%{_mandir}/man1/rscryutil.1.gz
+%{_libdir}/rsyslog/lmcry_gcry.so
+
+%files doc
+%defattr(-,root,root)
+%doc %{rsyslog_docdir}/html
+
 
 %changelog
 * Fri Mar 24 2016 Peter Portante <pportant@redhat.com> 8.14.0
