@@ -12,7 +12,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 8.14.0
-Release: 0%{?dist}
+Release: 3%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -23,8 +23,6 @@ Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
 Patch0: rsyslog-8.8.0-sd-service.patch
-# prevent modification of trusted properties (proposed upstream)
-Patch1: rsyslog-8.8.0-immutable-json-props.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -336,7 +334,6 @@ mv build doc
 # set up rsyslog sources
 %setup -q -D
 %patch0 -p1
-%patch1 -p1
 
 autoreconf -iv
 
