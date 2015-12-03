@@ -1,0 +1,29 @@
+From 70f3c97a76a6638312dccfece288452bca1df87c Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Mon, 30 Nov 2015 05:41:50 +0000
+Subject: [PATCH 03/11] Enable rscript comparison tests
+
+---
+ tests/Makefile.am | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 8f7ab58..cd1f68b 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -123,6 +123,12 @@ TESTS +=  \
+ 	rscript_wrap3.sh \
+ 	rscript_re_extract.sh \
+ 	rscript_re_match.sh \
++	rscript_eq.sh \
++	rscript_ge.sh \
++	rscript_gt.sh \
++	rscript_le.sh \
++	rscript_lt.sh \
++	rscript_ne.sh \
+ 	rs_optimizer_pri.sh \
+ 	cee_simple.sh \
+ 	cee_diskqueue.sh \
+-- 
+2.1.0
+

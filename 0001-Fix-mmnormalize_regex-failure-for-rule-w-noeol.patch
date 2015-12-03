@@ -1,0 +1,22 @@
+From 46857adc289ba07f45888fb6a15294019618f0a1 Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Wed, 25 Nov 2015 02:59:36 +0000
+Subject: [PATCH 01/11] Fix mmnormalize_regex failure for rule w/ noeol
+
+Looks like at least on Fedora 21 with liblognorm 1.1.2-2, this test
+fails because of the missing newline character before EOF.
+---
+ tests/testsuites/mmnormalize_regex.rulebase | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/testsuites/mmnormalize_regex.rulebase b/tests/testsuites/mmnormalize_regex.rulebase
+index f58e8f2..d9dbb47 100644
+--- a/tests/testsuites/mmnormalize_regex.rulebase
++++ b/tests/testsuites/mmnormalize_regex.rulebase
+@@ -1 +1 @@
+-rule=:http host ports are %hps:regex:([0-9.\x3a]+(, )?)+% etc
+\ No newline at end of file
++rule=:http host ports are %hps:regex:([0-9.\x3a]+(, )?)+% etc
+-- 
+2.1.0
+

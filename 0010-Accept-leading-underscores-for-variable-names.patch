@@ -1,0 +1,85 @@
+From d5f1c1d83d09beb0c0acad63553d0cc3fa3d907a Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Wed, 25 Nov 2015 00:45:49 +0000
+Subject: [PATCH 10/11] Accept leading underscores for variable names
+
+The grammar now allows for leading underscores for variable names. This
+addresses a problem stemming from the fact that the imjournal module
+will create variables using the given name from systemd. All "trusted"
+variables in systemd begin with a leading underscore.
+---
+ grammar/lexer.l                                   |  2 +-
+ tests/Makefile.am                                 |  3 +++
+ tests/testsuites/variable_leading_underscore.conf |  3 +++
+ tests/variable_leading_underscore.sh              | 15 +++++++++++++++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
+ create mode 100644 tests/testsuites/variable_leading_underscore.conf
+ create mode 100755 tests/variable_leading_underscore.sh
+
+diff --git a/grammar/lexer.l b/grammar/lexer.l
+index 2fd4433..5dcafad 100644
+--- a/grammar/lexer.l
++++ b/grammar/lexer.l
+@@ -141,7 +141,7 @@ int fileno(FILE *stream);
+ <EXPR>0[0-7]+ |			/* octal number */
+ <EXPR>0x[0-7a-f] |		/* hex number, following rule is dec; strtoll handles all! */
+ <EXPR>([1-9][0-9]*|0)		{ yylval.n = strtoll(yytext, NULL, 0); return NUMBER; }
+-<EXPR>\$[$!./]{0,1}[@a-z][!@a-z0-9\-_\.\[\]]*	{ yylval.s = strdup(yytext+1); return VAR; }
++<EXPR>\$[$!./]{0,1}[@a-z_][!@a-z0-9\-_\.\[\]]*	{ yylval.s = strdup(yytext+1); return VAR; }
+ <EXPR>\'([^'\\]|\\['"\\$bntr]|\\x[0-9a-f][0-9a-f]|\\[0-7][0-7][0-7])*\'	 {
+ 				   yytext[yyleng-1] = '\0';
+ 				   unescapeStr((uchar*)yytext+1, yyleng-2);
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index ac2074b..835a324 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -70,6 +70,7 @@ TESTS +=  \
+ 	abort-uncleancfg-goodcfg-check.sh \
+ 	abort-uncleancfg-badcfg-check.sh \
+ 	abort-uncleancfg-badcfg-check_1.sh \
++	variable_leading_underscore.sh \
+ 	gzipwr_large.sh \
+ 	gzipwr_large_dynfile.sh \
+ 	dynfile_invld_async.sh \
+@@ -726,6 +727,8 @@ EXTRA_DIST= \
+ 	testsuites/abort-uncleancfg-badcfg.conf \
+ 	abort-uncleancfg-badcfg-check_1.sh \
+ 	testsuites/abort-uncleancfg-badcfg_1.conf \
++	variable_leading_underscore.sh \
++	testsuites/variable_leading_underscore.conf \
+ 	gzipwr_large.sh \
+ 	testsuites/gzipwr_large.conf \
+ 	gzipwr_large_dynfile.sh \
+diff --git a/tests/testsuites/variable_leading_underscore.conf b/tests/testsuites/variable_leading_underscore.conf
+new file mode 100644
+index 0000000..1b2ade8
+--- /dev/null
++++ b/tests/testsuites/variable_leading_underscore.conf
+@@ -0,0 +1,3 @@
++$IncludeConfig diag-common.conf
++
++set $.foo = $!_FOO;
+diff --git a/tests/variable_leading_underscore.sh b/tests/variable_leading_underscore.sh
+new file mode 100755
+index 0000000..869b3fb
+--- /dev/null
++++ b/tests/variable_leading_underscore.sh
+@@ -0,0 +1,15 @@
++#!/bin/bash
++# Copyright 2015 Red Hat, Inc.
++# This file is part of the rsyslog project, released  under ASL 2.0
++# The configuration test should pass because we now support leading
++# underscores in variable names.
++echo ===============================================================================
++echo \[variable_leading_underscore.sh\]: testing variables with leading underscores
++. $srcdir/diag.sh init
++../tools/rsyslogd  -C -N1 -f$srcdir/testsuites/variable_leading_underscore.conf -M../runtime/.libs:../.libs
++if [ $? -ne 0 ]; then
++   echo "Error: config check fail"
++   exit 1 
++fi
++. $srcdir/diag.sh exit
++
+-- 
+2.1.0
+

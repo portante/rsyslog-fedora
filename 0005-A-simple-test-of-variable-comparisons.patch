@@ -1,0 +1,87 @@
+From d469f711c0262e8db0e97a0f40b437385c72d176 Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Tue, 1 Dec 2015 23:17:54 +0000
+Subject: [PATCH 05/11] A simple test of variable comparisons
+
+---
+ tests/Makefile.am                   |  5 ++++-
+ tests/json_var_cmpr.sh              | 14 ++++++++++++++
+ tests/testsuites/json_var_cmpr.conf | 22 ++++++++++++++++++++++
+ 3 files changed, 40 insertions(+), 1 deletion(-)
+ create mode 100755 tests/json_var_cmpr.sh
+ create mode 100644 tests/testsuites/json_var_cmpr.conf
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index b6c3d9f..ac2074b 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -255,7 +255,8 @@ TESTS +=  \
+ 	json_nonarray_looping.sh
+ endif
+ TESTS +=  \
+-	stop_when_array_has_element.sh
++	stop_when_array_has_element.sh \
++	json_var_cmpr.sh
+ endif
+ 
+ if ENABLE_GNUTLS
+@@ -892,6 +893,8 @@ EXTRA_DIST= \
+ 	testsuites/lookup_table.conf \
+ 	testsuites/xlate.lkp_tbl \
+ 	testsuites/xlate_more.lkp_tbl \
++	json_var_cmpr.sh \
++	testsuites/json_var_cmpr.conf \
+ 	cfg.sh
+ 
+ # TODO: re-enable
+diff --git a/tests/json_var_cmpr.sh b/tests/json_var_cmpr.sh
+new file mode 100755
+index 0000000..fe139fe
+--- /dev/null
++++ b/tests/json_var_cmpr.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2015-11-24 by portant
++# This file is part of the rsyslog project, released under ASL 2.0
++echo =============================================================================================
++echo \[json_var_case.sh\]: test for referencing local and global variables properly in comparisons
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup json_var_cmpr.conf
++. $srcdir/diag.sh tcpflood -m 1 -M "\"<167>Nov  6 12:34:56 172.0.0.1 test: @cee: { \\\"val\\\": \\\"abc\\\" }\""
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown
++. $srcdir/diag.sh content-check  "json prop:abc  local prop:def  global prop:ghi"
++. $srcdir/diag.sh exit
+diff --git a/tests/testsuites/json_var_cmpr.conf b/tests/testsuites/json_var_cmpr.conf
+new file mode 100644
+index 0000000..b191082
+--- /dev/null
++++ b/tests/testsuites/json_var_cmpr.conf
+@@ -0,0 +1,22 @@
++$IncludeConfig diag-common.conf
++module(load="../plugins/mmjsonparse/.libs/mmjsonparse")
++module(load="../plugins/imtcp/.libs/imtcp")
++input(type="imtcp" port="13514")
++
++# we must make sure the template contains references to the variables
++template(name="outfmt" type="string" string="json prop:%$!val%  local prop:%$.val%  global prop:%$/val%\n")
++
++action(type="mmjsonparse")
++
++set $.val = "123";
++set $.rval = "123";
++if ($.val == $.rval) then {
++	set $.val = "def";
++}
++set $/val = "123";
++set $/rval = "123";
++if ($/val == $/rval) then {
++	set $/val = "ghi";
++}
++
++action(type="omfile" file="./rsyslog.out.log" template="outfmt")
+-- 
+2.1.0
+

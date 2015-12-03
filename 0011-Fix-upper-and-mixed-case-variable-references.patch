@@ -1,0 +1,279 @@
+From 32dd8e68334e0cbac34b6a06c3927765ebe69251 Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Wed, 25 Nov 2015 06:53:36 +0000
+Subject: [PATCH 11/11] Fix upper and mixed case variable references
+
+We could not reference mixed or upper case variables properly prior to
+this change, as they were always lowercased before references were
+pulled.
+---
+ runtime/msg.c                       | 100 +++++++++++++++++++-----------------
+ template.c                          |   4 +-
+ tests/Makefile.am                   |   5 +-
+ tests/json_var_case.sh              |  15 ++++++
+ tests/testsuites/json_var_case.conf |  14 +++++
+ 5 files changed, 89 insertions(+), 49 deletions(-)
+ create mode 100755 tests/json_var_case.sh
+ create mode 100644 tests/testsuites/json_var_case.conf
+
+diff --git a/runtime/msg.c b/runtime/msg.c
+index d865ac8..8967848 100644
+--- a/runtime/msg.c
++++ b/runtime/msg.c
+@@ -539,87 +539,87 @@ propNameToID(uchar *pName, propid_t *pPropID)
+ 
+ 	/* sometimes there are aliases to the original MonitoWare
+ 	 * property names. These come after || in the ifs below. */
+-	if(!strcmp((char*) pName, "msg")) {
++	if(!strcasecmp((char*) pName, "msg")) {
+ 		*pPropID = PROP_MSG;
+-	} else if(!strcmp((char*) pName, "timestamp")
+-		  || !strcmp((char*) pName, "timereported")) {
++	} else if(!strcasecmp((char*) pName, "timestamp")
++		  || !strcasecmp((char*) pName, "timereported")) {
+ 		*pPropID = PROP_TIMESTAMP;
+-	} else if(!strcmp((char*) pName, "hostname") || !strcmp((char*) pName, "source")) {
++	} else if(!strcasecmp((char*) pName, "hostname") || !strcasecmp((char*) pName, "source")) {
+ 		*pPropID = PROP_HOSTNAME;
+-	} else if(!strcmp((char*) pName, "syslogtag")) {
++	} else if(!strcasecmp((char*) pName, "syslogtag")) {
+ 		*pPropID = PROP_SYSLOGTAG;
+-	} else if(!strcmp((char*) pName, "rawmsg")) {
++	} else if(!strcasecmp((char*) pName, "rawmsg")) {
+ 		*pPropID = PROP_RAWMSG;
+-	} else if(!strcmp((char*) pName, "rawmsg-after-pri")) {
++	} else if(!strcasecmp((char*) pName, "rawmsg-after-pri")) {
+ 		*pPropID = PROP_RAWMSG_AFTER_PRI;
+-	} else if(!strcmp((char*) pName, "inputname")) {
++	} else if(!strcasecmp((char*) pName, "inputname")) {
+ 		*pPropID = PROP_INPUTNAME;
+-	} else if(!strcmp((char*) pName, "fromhost")) {
++	} else if(!strcasecmp((char*) pName, "fromhost")) {
+ 		*pPropID = PROP_FROMHOST;
+-	} else if(!strcmp((char*) pName, "fromhost-ip")) {
++	} else if(!strcasecmp((char*) pName, "fromhost-ip")) {
+ 		*pPropID = PROP_FROMHOST_IP;
+-	} else if(!strcmp((char*) pName, "pri")) {
++	} else if(!strcasecmp((char*) pName, "pri")) {
+ 		*pPropID = PROP_PRI;
+-	} else if(!strcmp((char*) pName, "pri-text")) {
++	} else if(!strcasecmp((char*) pName, "pri-text")) {
+ 		*pPropID = PROP_PRI_TEXT;
+-	} else if(!strcmp((char*) pName, "iut")) {
++	} else if(!strcasecmp((char*) pName, "iut")) {
+ 		*pPropID = PROP_IUT;
+-	} else if(!strcmp((char*) pName, "syslogfacility")) {
++	} else if(!strcasecmp((char*) pName, "syslogfacility")) {
+ 		*pPropID = PROP_SYSLOGFACILITY;
+-	} else if(!strcmp((char*) pName, "syslogfacility-text")) {
++	} else if(!strcasecmp((char*) pName, "syslogfacility-text")) {
+ 		*pPropID = PROP_SYSLOGFACILITY_TEXT;
+-	} else if(!strcmp((char*) pName, "syslogseverity") || !strcmp((char*) pName, "syslogpriority")) {
++	} else if(!strcasecmp((char*) pName, "syslogseverity") || !strcasecmp((char*) pName, "syslogpriority")) {
+ 		*pPropID = PROP_SYSLOGSEVERITY;
+-	} else if(!strcmp((char*) pName, "syslogseverity-text") || !strcmp((char*) pName, "syslogpriority-text")) {
++	} else if(!strcasecmp((char*) pName, "syslogseverity-text") || !strcasecmp((char*) pName, "syslogpriority-text")) {
+ 		*pPropID = PROP_SYSLOGSEVERITY_TEXT;
+-	} else if(!strcmp((char*) pName, "timegenerated")) {
++	} else if(!strcasecmp((char*) pName, "timegenerated")) {
+ 		*pPropID = PROP_TIMEGENERATED;
+-	} else if(!strcmp((char*) pName, "programname")) {
++	} else if(!strcasecmp((char*) pName, "programname")) {
+ 		*pPropID = PROP_PROGRAMNAME;
+-	} else if(!strcmp((char*) pName, "protocol-version")) {
++	} else if(!strcasecmp((char*) pName, "protocol-version")) {
+ 		*pPropID = PROP_PROTOCOL_VERSION;
+-	} else if(!strcmp((char*) pName, "structured-data")) {
++	} else if(!strcasecmp((char*) pName, "structured-data")) {
+ 		*pPropID = PROP_STRUCTURED_DATA;
+-	} else if(!strcmp((char*) pName, "app-name")) {
++	} else if(!strcasecmp((char*) pName, "app-name")) {
+ 		*pPropID = PROP_APP_NAME;
+-	} else if(!strcmp((char*) pName, "procid")) {
++	} else if(!strcasecmp((char*) pName, "procid")) {
+ 		*pPropID = PROP_PROCID;
+-	} else if(!strcmp((char*) pName, "msgid")) {
++	} else if(!strcasecmp((char*) pName, "msgid")) {
+ 		*pPropID = PROP_MSGID;
+-	} else if(!strcmp((char*) pName, "jsonmesg")) {
++	} else if(!strcasecmp((char*) pName, "jsonmesg")) {
+ 		*pPropID = PROP_JSONMESG;
+-	} else if(!strcmp((char*) pName, "parsesuccess")) {
++	} else if(!strcasecmp((char*) pName, "parsesuccess")) {
+ 		*pPropID = PROP_PARSESUCCESS;
+ #ifdef USE_LIBUUID
+-	} else if(!strcmp((char*) pName, "uuid")) {
++	} else if(!strcasecmp((char*) pName, "uuid")) {
+ 		*pPropID = PROP_UUID;
+ #endif
+ 	/* here start system properties (those, that do not relate to the message itself */
+-	} else if(!strcmp((char*) pName, "$now")) {
++	} else if(!strcasecmp((char*) pName, "$NOW")) {
+ 		*pPropID = PROP_SYS_NOW;
+-	} else if(!strcmp((char*) pName, "$year")) {
++	} else if(!strcasecmp((char*) pName, "$YEAR")) {
+ 		*pPropID = PROP_SYS_YEAR;
+-	} else if(!strcmp((char*) pName, "$month")) {
++	} else if(!strcasecmp((char*) pName, "$MONTH")) {
+ 		*pPropID = PROP_SYS_MONTH;
+-	} else if(!strcmp((char*) pName, "$day")) {
++	} else if(!strcasecmp((char*) pName, "$DAY")) {
+ 		*pPropID = PROP_SYS_DAY;
+-	} else if(!strcmp((char*) pName, "$hour")) {
++	} else if(!strcasecmp((char*) pName, "$HOUR")) {
+ 		*pPropID = PROP_SYS_HOUR;
+-	} else if(!strcmp((char*) pName, "$hhour")) {
++	} else if(!strcasecmp((char*) pName, "$HHOUR")) {
+ 		*pPropID = PROP_SYS_HHOUR;
+-	} else if(!strcmp((char*) pName, "$qhour")) {
++	} else if(!strcasecmp((char*) pName, "$QHOUR")) {
+ 		*pPropID = PROP_SYS_QHOUR;
+-	} else if(!strcmp((char*) pName, "$minute")) {
++	} else if(!strcasecmp((char*) pName, "$MINUTE")) {
+ 		*pPropID = PROP_SYS_MINUTE;
+-	} else if(!strcmp((char*) pName, "$myhostname")) {
++	} else if(!strcasecmp((char*) pName, "$MYHOSTNAME")) {
+ 		*pPropID = PROP_SYS_MYHOSTNAME;
+-	} else if(!strcmp((char*) pName, "$!all-json")) {
++	} else if(!strcasecmp((char*) pName, "$!all-json")) {
+ 		*pPropID = PROP_CEE_ALL_JSON;
+-	} else if(!strcmp((char*) pName, "$!all-json-plain")) {
++	} else if(!strcasecmp((char*) pName, "$!all-json-plain")) {
+ 		*pPropID = PROP_CEE_ALL_JSON_PLAIN;
+-	} else if(!strcmp((char*) pName, "$bom")) {
++	} else if(!strcasecmp((char*) pName, "$BOM")) {
+ 		*pPropID = PROP_SYS_BOM;
+-	} else if(!strcmp((char*) pName, "$uptime")) {
++	} else if(!strcasecmp((char*) pName, "$UPTIME")) {
+ 		*pPropID = PROP_SYS_UPTIME;
+ 	} else if(!strncmp((char*) pName, "$!", 2) || pName[0] == '!') {
+ 		*pPropID = PROP_CEE;
+@@ -651,6 +651,8 @@ uchar *propIDToName(propid_t propID)
+ 			return UCHAR_CONSTANT("syslogtag");
+ 		case PROP_RAWMSG:
+ 			return UCHAR_CONSTANT("rawmsg");
++		case PROP_RAWMSG_AFTER_PRI:
++			return UCHAR_CONSTANT("rawmsg-after-pri");
+ 		case PROP_INPUTNAME:
+ 			return UCHAR_CONSTANT("inputname");
+ 		case PROP_FROMHOST:
+@@ -689,6 +691,10 @@ uchar *propIDToName(propid_t propID)
+ 			return UCHAR_CONSTANT("jsonmesg");
+ 		case PROP_PARSESUCCESS:
+ 			return UCHAR_CONSTANT("parsesuccess");
++#ifdef USE_LIBUUID
++		case PROP_UUID:
++			return UCHAR_CONSTANT("uuid");
++#endif
+ 		case PROP_SYS_NOW:
+ 			return UCHAR_CONSTANT("$NOW");
+ 		case PROP_SYS_YEAR:
+@@ -707,18 +713,20 @@ uchar *propIDToName(propid_t propID)
+ 			return UCHAR_CONSTANT("$MINUTE");
+ 		case PROP_SYS_MYHOSTNAME:
+ 			return UCHAR_CONSTANT("$MYHOSTNAME");
+-		case PROP_CEE:
+-			return UCHAR_CONSTANT("*CEE-based property*");
+-		case PROP_LOCAL_VAR:
+-			return UCHAR_CONSTANT("*LOCAL_VARIABLE*");
+ 		case PROP_CEE_ALL_JSON:
+ 			return UCHAR_CONSTANT("$!all-json");
+ 		case PROP_CEE_ALL_JSON_PLAIN:
+ 			return UCHAR_CONSTANT("$!all-json-plain");
+ 		case PROP_SYS_BOM:
+ 			return UCHAR_CONSTANT("$BOM");
+-		case PROP_UUID:
+-			return UCHAR_CONSTANT("uuid");
++		case PROP_SYS_UPTIME:
++			return UCHAR_CONSTANT("$UPTIME");
++		case PROP_CEE:
++			return UCHAR_CONSTANT("*CEE-based property*");
++		case PROP_LOCAL_VAR:
++			return UCHAR_CONSTANT("*LOCAL_VARIABLE*");
++		case PROP_GLOBAL_VAR:
++			return UCHAR_CONSTANT("*GLOBAL_VARIABLE*");
+ 		default:
+ 			return UCHAR_CONSTANT("*invalid property id*");
+ 	}
+diff --git a/template.c b/template.c
+index eb78074..2ff4710 100644
+--- a/template.c
++++ b/template.c
+@@ -834,8 +834,8 @@ do_Parameter(uchar **pp, struct template *pTpl)
+ 	pTpe->eEntryType = FIELD;
+ 
+ 	while(*p && *p != '%' && *p != ':') {
+-		cstrAppendChar(pStrProp, tolower(*p));
+-		++p; /* do NOT do this in tolower()! */
++		cstrAppendChar(pStrProp, *p);
++		++p;
+ 	}
+ 
+ 	/* got the name */
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 835a324..3b0031a 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -257,7 +257,8 @@ TESTS +=  \
+ endif
+ TESTS +=  \
+ 	stop_when_array_has_element.sh \
+-	json_var_cmpr.sh
++	json_var_cmpr.sh \
++	json_var_case.sh
+ endif
+ 
+ if ENABLE_GNUTLS
+@@ -898,6 +899,8 @@ EXTRA_DIST= \
+ 	testsuites/xlate_more.lkp_tbl \
+ 	json_var_cmpr.sh \
+ 	testsuites/json_var_cmpr.conf \
++	json_var_case.sh \
++	testsuites/json_var_case.conf \
+ 	cfg.sh
+ 
+ # TODO: re-enable
+diff --git a/tests/json_var_case.sh b/tests/json_var_case.sh
+new file mode 100755
+index 0000000..b618eb6
+--- /dev/null
++++ b/tests/json_var_case.sh
+@@ -0,0 +1,15 @@
++#!/bin/bash
++# added 2015-11-24 by portant
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===========================================================================================
++echo \[json_var_case.sh\]: test for JSON upper and lower case variables, and leading underscores
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup json_var_case.conf
++. $srcdir/diag.sh tcpflood -m 1 -M "\"<167>Nov  6 12:34:56 172.0.0.1 test: @cee: { \\\"abc\\\": \\\"1\\\", \\\"ABC\\\": \\\"2\\\", \\\"aBc\\\": \\\"3\\\", \\\"_abc\\\": \\\"4\\\", \\\"_ABC\\\": \\\"5\\\", \\\"_aBc\\\": \\\"6\\\" }\""
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown
++# NOTE: conf file updates _aBc to "7"
++. $srcdir/diag.sh content-check  "abc:1 ABC:2 aBc:3 _abc:4 _ABC:5 _aBc:7"
++. $srcdir/diag.sh exit
+diff --git a/tests/testsuites/json_var_case.conf b/tests/testsuites/json_var_case.conf
+new file mode 100644
+index 0000000..0c640fa
+--- /dev/null
++++ b/tests/testsuites/json_var_case.conf
+@@ -0,0 +1,14 @@
++$IncludeConfig diag-common.conf
++module(load="../plugins/mmjsonparse/.libs/mmjsonparse")
++module(load="../plugins/imtcp/.libs/imtcp")
++input(type="imtcp" port="13514")
++
++# we must make sure the template contains references to the variables
++template(name="outfmt" type="string" string="abc:%$!abc% ABC:%$!ABC% aBc:%$!aBc% _abc:%$!_abc% _ABC:%$!_ABC% _aBc:%$!_aBc%\n")
++template(name="outfmt-all-json" type="string" string="%$!all-json%\n")
++
++action(type="mmjsonparse")
++set $!_aBc = "7";
++action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++if $!_aBc != "7" then
++	action(type="omfile" file="./rsyslog2.out.log" template="outfmt-all-json")
+-- 
+2.1.0
+

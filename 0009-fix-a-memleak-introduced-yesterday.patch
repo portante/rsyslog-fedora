@@ -1,0 +1,35 @@
+From bb269ef9057a9616b7c4ba8381b036869682d4fa Mon Sep 17 00:00:00 2001
+From: Rainer Gerhards <rgerhards@adiscon.com>
+Date: Tue, 17 Nov 2015 10:59:41 +0100
+Subject: [PATCH 09/11] fix a memleak introduced yesterday
+
+never-released code
+---
+ grammar/rainerscript.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/grammar/rainerscript.c b/grammar/rainerscript.c
+index b50060d..be68441 100644
+--- a/grammar/rainerscript.c
++++ b/grammar/rainerscript.c
+@@ -2569,9 +2569,15 @@ struct json_object*
+ cnfexprEvalCollection(struct cnfexpr *__restrict__ const expr, void *__restrict__ const usrptr)
+ {
+ 	struct var ret;
++	void *retptr;
+ 	cnfexprEval(expr, &ret, usrptr);
+-	return (ret.datatype == 'J') ? ret.d.json : NULL;
+-	/*caller is supposed to free the returned json-object*/
++	if(ret.datatype == 'J') {
++		retptr = ret.d.json; /*caller is supposed to free the returned json-object*/
++	} else {
++		retptr = NULL;
++		varFreeMembers(&ret); /* we must free the element */
++	}
++	return retptr;
+ }
+ 
+ inline static void
+-- 
+2.1.0
+

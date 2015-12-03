@@ -1,0 +1,588 @@
+From 6bcee28d2cb6896855d505c40cf935504a125237 Mon Sep 17 00:00:00 2001
+From: Peter Portante <peter.portante@redhat.com>
+Date: Mon, 30 Nov 2015 05:45:01 +0000
+Subject: [PATCH 04/11] Tests to verify string variable comparisons
+
+---
+ tests/Makefile.am                    | 18 +++++++++++
+ tests/rscript_eq_var.sh              | 14 +++++++++
+ tests/rscript_ge_var.sh              | 14 +++++++++
+ tests/rscript_gt_var.sh              | 14 +++++++++
+ tests/rscript_le_var.sh              | 14 +++++++++
+ tests/rscript_lt_var.sh              | 14 +++++++++
+ tests/rscript_ne_var.sh              | 14 +++++++++
+ tests/testsuites/rscript_eq_var.conf | 57 ++++++++++++++++++++++++++++++++++
+ tests/testsuites/rscript_ge_var.conf | 60 ++++++++++++++++++++++++++++++++++++
+ tests/testsuites/rscript_gt_var.conf | 54 ++++++++++++++++++++++++++++++++
+ tests/testsuites/rscript_le_var.conf | 60 ++++++++++++++++++++++++++++++++++++
+ tests/testsuites/rscript_lt_var.conf | 54 ++++++++++++++++++++++++++++++++
+ tests/testsuites/rscript_ne_var.conf | 60 ++++++++++++++++++++++++++++++++++++
+ 13 files changed, 447 insertions(+)
+ create mode 100755 tests/rscript_eq_var.sh
+ create mode 100755 tests/rscript_ge_var.sh
+ create mode 100755 tests/rscript_gt_var.sh
+ create mode 100755 tests/rscript_le_var.sh
+ create mode 100755 tests/rscript_lt_var.sh
+ create mode 100755 tests/rscript_ne_var.sh
+ create mode 100644 tests/testsuites/rscript_eq_var.conf
+ create mode 100644 tests/testsuites/rscript_ge_var.conf
+ create mode 100644 tests/testsuites/rscript_gt_var.conf
+ create mode 100644 tests/testsuites/rscript_le_var.conf
+ create mode 100644 tests/testsuites/rscript_lt_var.conf
+ create mode 100644 tests/testsuites/rscript_ne_var.conf
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index cd1f68b..b6c3d9f 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -124,11 +124,17 @@ TESTS +=  \
+ 	rscript_re_extract.sh \
+ 	rscript_re_match.sh \
+ 	rscript_eq.sh \
++	rscript_eq_var.sh \
+ 	rscript_ge.sh \
++	rscript_ge_var.sh \
+ 	rscript_gt.sh \
++	rscript_gt_var.sh \
+ 	rscript_le.sh \
++	rscript_le_var.sh \
+ 	rscript_lt.sh \
++	rscript_lt_var.sh \
+ 	rscript_ne.sh \
++	rscript_ne_var.sh \
+ 	rs_optimizer_pri.sh \
+ 	cee_simple.sh \
+ 	cee_diskqueue.sh \
+@@ -452,16 +458,28 @@ EXTRA_DIST= \
+ 	testsuites/stop.conf \
+ 	rscript_le.sh \
+ 	testsuites/rscript_le.conf \
++	rscript_le_var.sh \
++	testsuites/rscript_le_var.conf \
+ 	rscript_ge.sh \
+ 	testsuites/rscript_ge.conf \
++	rscript_ge_var.sh \
++	testsuites/rscript_ge_var.conf \
+ 	rscript_lt.sh \
+ 	testsuites/rscript_lt.conf \
++	rscript_lt_var.sh \
++	testsuites/rscript_lt_var.conf \
+ 	rscript_gt.sh \
+ 	testsuites/rscript_gt.conf \
++	rscript_gt_var.sh \
++	testsuites/rscript_gt_var.conf \
+ 	rscript_ne.sh \
+ 	testsuites/rscript_ne.conf \
++	rscript_ne_var.sh \
++	testsuites/rscript_ne_var.conf \
+ 	rscript_eq.sh \
+ 	testsuites/rscript_eq.conf \
++	rscript_eq_var.sh \
++	testsuites/rscript_eq_var.conf \
+ 	rscript_set_modify.sh \
+ 	testsuites/rscript_set_modify.conf \
+ 	testsuites/rscript_unaffected_reset.conf \
+diff --git a/tests/rscript_eq_var.sh b/tests/rscript_eq_var.sh
+new file mode 100755
+index 0000000..be5dafe
+--- /dev/null
++++ b/tests/rscript_eq_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_eq.sh\]: testing rainerscript EQ statement comparing two variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_eq_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/rscript_ge_var.sh b/tests/rscript_ge_var.sh
+new file mode 100755
+index 0000000..5bb7538
+--- /dev/null
++++ b/tests/rscript_ge_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_ge.sh\]: testing rainerscript GE statement for two JSON variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_ge_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/rscript_gt_var.sh b/tests/rscript_gt_var.sh
+new file mode 100755
+index 0000000..cca3378
+--- /dev/null
++++ b/tests/rscript_gt_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_gt.sh\]: testing rainerscript GT statement for two JSON variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_gt_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/rscript_le_var.sh b/tests/rscript_le_var.sh
+new file mode 100755
+index 0000000..2e04d3b
+--- /dev/null
++++ b/tests/rscript_le_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_le.sh\]: testing rainerscript LE statement for two JSON variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_le_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/rscript_lt_var.sh b/tests/rscript_lt_var.sh
+new file mode 100755
+index 0000000..168cf74
+--- /dev/null
++++ b/tests/rscript_lt_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_lt.sh\]: testing rainerscript LT statement for two JSON variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_lt_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/rscript_ne_var.sh b/tests/rscript_ne_var.sh
+new file mode 100755
+index 0000000..e861b6f
+--- /dev/null
++++ b/tests/rscript_ne_var.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++# added 2014-01-17 by rgerhards
++# This file is part of the rsyslog project, released under ASL 2.0
++echo ===============================================================================
++echo \[rscript_ne.sh\]: testing rainerscript NE statement for two JSON variables
++. $srcdir/diag.sh init
++. $srcdir/diag.sh startup rscript_ne_var.conf
++. $srcdir/diag.sh injectmsg  0 1
++echo doing shutdown
++. $srcdir/diag.sh shutdown-when-empty
++echo wait on shutdown
++. $srcdir/diag.sh wait-shutdown 
++. $srcdir/diag.sh seq-check  0 0
++. $srcdir/diag.sh exit
+diff --git a/tests/testsuites/rscript_eq_var.conf b/tests/testsuites/rscript_eq_var.conf
+new file mode 100644
+index 0000000..022afd4
+--- /dev/null
++++ b/tests/testsuites/rscript_eq_var.conf
+@@ -0,0 +1,57 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "value";
++set $!var2 = "value";
++if $!var1 == $!var2 then {
++	set $!var2 = "bad";
++	if $!var1 == $!var2 then {
++		# Failure
++		stop
++	} else {
++		unset $!var1;
++		unset $!var2;
++	}
++} else {
++	# Failure
++	stop
++}
++set $.var1 = "value";
++set $.var2 = "value";
++if $.var1 == $.var2 then {
++	set $.var2 = "bad";
++	if $.var1 == $.var2 then {
++		# Failure
++		stop
++	} else {
++		unset $.var1;
++		unset $.var2;
++	}
++} else {
++	# Failure
++	stop
++}
++set $/var1 = "value";
++set $/var2 = "value";
++if $/var1 == $/var2 then {
++	set $/var2 = "bad";
++	if $/var1 == $/var2 then {
++		# Failure
++		stop
++	} else {
++		unset $/var1;
++		unset $/var2;
++	}
++} else {
++	# Failure
++	stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+diff --git a/tests/testsuites/rscript_ge_var.conf b/tests/testsuites/rscript_ge_var.conf
+new file mode 100644
+index 0000000..bb62736
+--- /dev/null
++++ b/tests/testsuites/rscript_ge_var.conf
+@@ -0,0 +1,60 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "42";
++set $!var2 = "42";
++set $!var3 = "41";
++if $!var1 >= $!var2 and $!var1 >= $!var3 then {
++        if $!var3 >= $!var1 then {
++                # Failure
++                stop
++        } else {
++                unset $!var1;
++                unset $!var2;
++                unset $!var3;
++        }
++} else {
++        # Failure
++        stop
++}
++set $.var1 = "42";
++set $.var2 = "42";
++set $.var3 = "41";
++if $.var1 >= $.var2 and $.var1 >= $.var3 then {
++        if $.var3 >= $.var1 then {
++                # Failure
++                stop
++        } else {
++                unset $.var1;
++                unset $.var2;
++                unset $.var3;
++        }
++} else {
++        # Failure
++        stop
++}
++set $/var1 = "42";
++set $/var2 = "42";
++set $/var3 = "41";
++if $/var1 >= $/var2 and $/var1 >= $/var3 then {
++        if $/var3 >= $/var1 then {
++                # Failure
++                stop
++        } else {
++                unset $/var1;
++                unset $/var2;
++                unset $/var3;
++        }
++} else {
++        # Failure
++        stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+diff --git a/tests/testsuites/rscript_gt_var.conf b/tests/testsuites/rscript_gt_var.conf
+new file mode 100644
+index 0000000..7751667
+--- /dev/null
++++ b/tests/testsuites/rscript_gt_var.conf
+@@ -0,0 +1,54 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "43";
++set $!var2 = "42";
++if $!var1 > $!var2 then {
++        if $!var2 > $!var1 then {
++                # Failure
++                stop
++        } else {
++                unset $!var1;
++                unset $!var2;
++        }
++} else {
++        # Failure
++        stop
++}
++set $.var1 = "43";
++set $.var2 = "42";
++if $.var1 > $.var2 then {
++        if $.var2 > $.var1 then {
++                # Failure
++                stop
++        } else {
++                unset $.var1;
++                unset $.var2;
++        }
++} else {
++        # Failure
++        stop
++}
++set $/var1 = "43";
++set $/var2 = "42";
++if $/var1 > $/var2 then {
++        if $/var2 > $/var1 then {
++                # Failure
++                stop
++        } else {
++                unset $/var1;
++                unset $/var2;
++        }
++} else {
++        # Failure
++        stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+diff --git a/tests/testsuites/rscript_le_var.conf b/tests/testsuites/rscript_le_var.conf
+new file mode 100644
+index 0000000..1c8293f
+--- /dev/null
++++ b/tests/testsuites/rscript_le_var.conf
+@@ -0,0 +1,60 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "42";
++set $!var2 = "42";
++set $!var3 = "43";
++if $!var1 <= $!var2 and $!var1 <= $!var3 then {
++        if $!var3 <= $!var1 then {
++                # Failure
++                stop
++        } else {
++                unset $!var1;
++                unset $!var2;
++                unset $!var3;
++        }
++} else {
++        # Failure
++        stop
++}
++set $.var1 = "42";
++set $.var2 = "42";
++set $.var3 = "43";
++if $.var1 <= $.var2 and $.var1 <= $.var3 then {
++        if $.var3 <= $.var1 then {
++                # Failure
++                stop
++        } else {
++                unset $.var1;
++                unset $.var2;
++                unset $.var3;
++        }
++} else {
++        # Failure
++        stop
++}
++set $/var1 = "42";
++set $/var2 = "42";
++set $/var3 = "43";
++if $/var1 <= $/var2 and $/var1 <= $/var3 then {
++        if $/var3 <= $/var1 then {
++                # Failure
++                stop
++        } else {
++                unset $/var1;
++                unset $/var2;
++                unset $/var3;
++        }
++} else {
++        # Failure
++        stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+diff --git a/tests/testsuites/rscript_lt_var.conf b/tests/testsuites/rscript_lt_var.conf
+new file mode 100644
+index 0000000..52328e1
+--- /dev/null
++++ b/tests/testsuites/rscript_lt_var.conf
+@@ -0,0 +1,54 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "41";
++set $!var2 = "42";
++if $!var1 < $!var2 then {
++        if $!var2 < $!var1 then {
++                # Failure
++                stop
++        } else {
++                unset $!var1;
++                unset $!var2;
++        }
++} else {
++        # Failure
++        stop
++}
++set $.var1 = "41";
++set $.var2 = "42";
++if $.var1 < $.var2 then {
++        if $.var2 < $.var1 then {
++                # Failure
++                stop
++        } else {
++                unset $.var1;
++                unset $.var2;
++        }
++} else {
++        # Failure
++        stop
++}
++set $/var1 = "41";
++set $/var2 = "42";
++if $/var1 < $/var2 then {
++        if $/var2 < $/var1 then {
++                # Failure
++                stop
++        } else {
++                unset $/var1;
++                unset $/var2;
++        }
++} else {
++        # Failure
++        stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+diff --git a/tests/testsuites/rscript_ne_var.conf b/tests/testsuites/rscript_ne_var.conf
+new file mode 100644
+index 0000000..26e71ea
+--- /dev/null
++++ b/tests/testsuites/rscript_ne_var.conf
+@@ -0,0 +1,60 @@
++$IncludeConfig diag-common.conf
++
++template(name="outfmt" type="list") {
++	property(name="$!usr!msgnum")
++	constant(value="\n")
++}
++
++set $!var1 = "value1";
++set $!var2 = "value2";
++if $!var1 != $!var2 then {
++	set $!var1 = "value";
++	set $!var2 = "value";
++	if $!var1 != $!var2 then {
++		# Failure
++		stop
++	} else {
++		unset $!var1;
++		unset $!var2;
++	}
++} else {
++	# Failure
++	stop
++}
++set $.var1 = "value1";
++set $.var2 = "value2";
++if $.var1 != $.var2 then {
++	set $.var1 = "value";
++	set $.var2 = "value";
++	if $.var1 != $.var2 then {
++		# Failure
++		stop
++	} else {
++		unset $.var1;
++		unset $.var2;
++	}
++} else {
++	# Failure
++	stop
++}
++set $/var1 = "value1";
++set $/var2 = "value2";
++if $/var1 != $/var2 then {
++	set $/var1 = "value";
++	set $/var2 = "value";
++	if $/var1 != $/var2 then {
++		# Failure
++		stop
++	} else {
++		unset $/var1;
++		unset $/var2;
++	}
++} else {
++	# Failure
++	stop
++}
++
++if $msg contains 'msgnum' then {
++	set $!usr!msgnum = field($msg, 58, 2);
++	action(type="omfile" file="./rsyslog.out.log" template="outfmt")
++}
+-- 
+2.1.0
+

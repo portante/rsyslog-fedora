@@ -12,7 +12,7 @@
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 8.14.0
-Release: 3%{?dist}
+Release: 5.case%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -23,6 +23,17 @@ Source3: rsyslog.sysconfig
 Source4: rsyslog.log
 # tweak the upstream service file to honour configuration from /etc/sysconfig/rsyslog
 Patch0: rsyslog-8.8.0-sd-service.patch
+Patch1: 0001-Fix-mmnormalize_regex-failure-for-rule-w-noeol.patch
+Patch2: 0002-fixed-rulebases-that-had-no-new-line-after-last-rule.patch
+Patch3: 0003-Enable-rscript-comparison-tests.patch
+Patch4: 0004-Tests-to-verify-string-variable-comparisons.patch
+Patch5: 0005-A-simple-test-of-variable-comparisons.patch
+Patch6: 0006-fix-inconsistent-number-processing.patch
+Patch7: 0007-convert-JSON-strings-inside-execution-engine-to-nati.patch
+Patch8: 0008-we-cannot-always-assume-a-returned-object-is-of-json.patch
+Patch9: 0009-fix-a-memleak-introduced-yesterday.patch
+Patch10: 0010-Accept-leading-underscores-for-variable-names.patch
+Patch11: 0011-Fix-upper-and-mixed-case-variable-references.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -334,6 +345,17 @@ mv build doc
 # set up rsyslog sources
 %setup -q -D
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
 
 autoreconf -iv
 

@@ -1,0 +1,27 @@
+From 33dcb1003fb2960fa6f6567ff67a96bad8863793 Mon Sep 17 00:00:00 2001
+From: Rainer Gerhards <rgerhards@adiscon.com>
+Date: Fri, 13 Nov 2015 13:06:01 +0100
+Subject: [PATCH 08/11] we cannot always assume a returned object is of json
+ type
+
+---
+ grammar/rainerscript.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grammar/rainerscript.c b/grammar/rainerscript.c
+index 2826b4b..b50060d 100644
+--- a/grammar/rainerscript.c
++++ b/grammar/rainerscript.c
+@@ -2570,7 +2570,8 @@ cnfexprEvalCollection(struct cnfexpr *__restrict__ const expr, void *__restrict_
+ {
+ 	struct var ret;
+ 	cnfexprEval(expr, &ret, usrptr);
+-	return ret.d.json;/*caller is supposed to free the returned json-object*/
++	return (ret.datatype == 'J') ? ret.d.json : NULL;
++	/*caller is supposed to free the returned json-object*/
+ }
+ 
+ inline static void
+-- 
+2.1.0
+
