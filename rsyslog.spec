@@ -6,13 +6,13 @@
 %global want_mongodb 0
 %else
 %global want_hiredis 1
-%global want_mongodb 1
+%global want_mongodb 0
 %endif
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 8.14.0
-Release: 3%{?dist}
+Version: 8.17.0
+Release: 1%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
@@ -30,21 +30,16 @@ BuildRequires: bison
 BuildRequires: dos2unix
 BuildRequires: flex
 BuildRequires: libtool
-BuildRequires: pkgconfig
 BuildRequires: libestr-devel >= 0.1.9
 BuildRequires: libee-devel
-BuildRequires: json-c-devel
 BuildRequires: curl-devel
 BuildRequires: libgt-devel
 BuildRequires: python-docutils
 BuildRequires: liblogging-stdlog-devel
-%if 0%{?fedora}0%{?rhel}>= 6
-#Requires: libksi
-BuildRequires: libksi-devel
-    %if 0%{?fedora}%{?rhel}>= 7
+BuildRequires: libfastjson-devel
+%if 0%{?fedora}%{?rhel}>= 7
 # make sure systemd is in a version that isn't affected by rhbz#974132
 BuildRequires: systemd-devel >= 204-8
-    %endif
 %endif
 BuildRequires: zlib-devel
 
@@ -138,7 +133,7 @@ Group: System Environment/Daemons
 Requires: %name = %version-%release
 
 %package mmutf8fix
-Summary: Message modification module encoding messages in UTF-8
+Summary: Fix invalid UTF-8 sequences in messages
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 
@@ -152,6 +147,13 @@ Summary: pmciscoios support
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 
+%if 0%{?fedora}0%{?rhel} >= 6
+%package rsgtutil
+Summary: RSyslog rsgtutil support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+Requires: %{name}-ksi = %version-%release
+
 %package elasticsearch
 Summary: ElasticSearch output module for rsyslog
 Group: System Environment/Daemons
@@ -161,7 +163,7 @@ BuildRequires: libcurl-devel
 
 %if %{want_mongodb}
 %package mongodb
-Summary: MongoDB support for rsyslog
+Summary: MongoDB output support
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: libmongo-client-devel
@@ -172,6 +174,21 @@ Summary: Kafka output support
 Group: System Environment/Daemons
 Requires: %name = %version-%release
 BuildRequires: adiscon-librdkafka-devel
+
+%package ksi
+Summary: KSI signature support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+Requires: libksi >= 3.4.0.0
+BuildRequires: libksi-devel
+
+%package mmgrok
+Summary: Grok pattern filtering support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+Requires: grok
+BuildRequires: json-c-devel glib2-devel grok grok-devel tokyocabinet-devel
+%endif
 
 %if %{want_hiredis}
 %package hiredis
@@ -253,11 +270,12 @@ spoof the sender address. Also, it enables to circle through a number
 of source ports.
 
 %description mmjsonparse
-This module provides the capability to recognize and parse JSON enhanced
-syslog messages.
+This module provides support for parsing structured log messages that follow
+the CEE/lumberjack specification.
 
 %description mmnormalize
-This module provides the capability to normalize log messages via liblognorm.
+The rsyslog-mmnormalize package provides log normalization by using the
+liblognorm and it's Rulebase format.
 
 %description mmfields
 Parse all fields of the message into structured data inside the JSON tree.
@@ -275,7 +293,10 @@ no longer be obtained. Note that anonymization will break digital
 signatures on the message, if they exist.
 
 %description mmutf8fix
-This module provides support for fixing invalid UTF-8 sequences. Most often, such invalid sequences result from syslog sources sending in non-UTF character sets, e.g. ISO 8859. As syslog does not have a way to convey the character set information, these sequences are not properly handled.
+This module provides support for fixing invalid UTF-8 sequences. Most often,
+such invalid sequences result from syslog sources sending in non-UTF character
+sets, e.g. ISO 8859. As syslog does not have a way to convey the character
+set information, these sequences are not properly handled.
 
 %description pmciscoios
 Parser module which supports various Cisco IOS formats.
@@ -287,14 +308,19 @@ is sent via its own mail. The ommail plugin is primarily meant for alerting user
 As such, it is assume that mails will only be sent in an extremely
 limited number of cases.
 
+%description rsgtutil
+Adds rsyslog utility used for GT and KSI signature verification and more.
+For more information see the rsgtutil manual.
+
 %description elasticsearch
 This module provides the capability for rsyslog to feed logs directly into
 ElasticSearch.
 
 %if %{want_mongodb}
 %description mongodb
-The rsyslog-mongodb package contains a dynamic shared object that will add
-MongoDB database support to rsyslog.
+MongoDB output plugin for rsyslog. This plugin allows rsyslog to write
+the syslog messages to MongoDB, a scalable, high-performance,
+open source NoSQL database.
 %endif
 
 %description kafka
@@ -307,6 +333,13 @@ for the producer and 3 million msgs/second for the consumer.
 %description hiredis
 This module provides output to Redis.
 %endif
+
+%description ksi
+The KSI signature plugin provides access to the Keyless Signature Infrastructure
+globally distributed by Guardtime.
+
+%description mmgrok
+This module provides filtering based on grok patterns.
 
 %description mmaudit
 This module provides message modification supporting Linux audit format
@@ -335,7 +368,7 @@ mv build doc
 %setup -q -D
 %patch0 -p1
 
-autoreconf -iv
+autoreconf -vfi
 
 %build
 %ifarch sparc64
@@ -354,6 +387,7 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
 %endif
 %configure \
         --prefix=/usr \
+        --enable-generate-man-pages \
         --disable-static \
         --disable-testbench \
         --enable-uuid \
@@ -366,7 +400,6 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
         --enable-gt-ksi \
         --enable-imjournal \
         --enable-omjournal \
-        --enable-generate-man-pages \
         --enable-gnutls \
         --enable-imfile \
         --enable-impstats \
@@ -393,8 +426,8 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
         --enable-pmaixforwardedfrom \
         --enable-pmciscoios \
         --enable-guardtime \
+        --enable-mmgrok \
         --enable-gssapi-krb5 \
-        --enable-imdiag \
         --enable-mmaudit \
         --enable-mmcount \
         --enable-mmsnmptrapd \
@@ -404,17 +437,9 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
         --enable-omrabbitmq \
         --enable-omstdout \
         --enable-pmcisconames \
-        --enable-pmsnare \
+        --enable-pmsnare
 
 make V=1
-
-# small portion of the test suite seems to be consistently failing (this is more severe on arm*)
-# there are also some random failures (~1 test out of the whole batch) on i686 and x86_64
-# thus the test suite is disabled for now until these issues are sorted out
-%check
-%if 0
-make V=1 check
-%endif
 
 %install
 make V=1 DESTDIR=%{buildroot} install
@@ -424,23 +449,24 @@ install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/rsyslog.d
 install -d -m 700 %{buildroot}%{rsyslog_statedir}
 install -d -m 700 %{buildroot}%{rsyslog_pkidir}
-install -d -m 755 %{buildroot}%{rsyslog_docdir}/html
 
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rsyslog.conf
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/rsyslog
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
+
+install -d -m 755 %{buildroot}%{rsyslog_docdir}/html
 install -p -m 644 plugins/ommysql/createDB.sql %{buildroot}%{rsyslog_docdir}/mysql-createDB.sql
 install -p -m 644 plugins/ompgsql/createDB.sql %{buildroot}%{rsyslog_docdir}/pgsql-createDB.sql
 dos2unix tools/recover_qi.pl
 install -p -m 644 tools/recover_qi.pl %{buildroot}%{rsyslog_docdir}/recover_qi.pl
 # extract documentation
 cp -r doc/* %{buildroot}%{rsyslog_docdir}/html
+
 # get rid of libtool libraries
 rm -f %{buildroot}%{_libdir}/rsyslog/*.la
+
 # get rid of socket activation by default
 sed -i '/^Alias/s/^/;/;/^Requires=syslog.socket/s/^/;/' %{buildroot}%{_unitdir}/rsyslog.service
-# imdiag is only used for testing
-rm -f %{buildroot}%{_libdir}/rsyslog/imdiag.so
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -460,25 +486,12 @@ done
 %defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
 %license COPYING*
-%doc AUTHORS ChangeLog README.md
+%doc AUTHORS NEWS ChangeLog README.md
 %{rsyslog_docdir}
 %exclude %{rsyslog_docdir}/html
 %exclude %{rsyslog_docdir}/mysql-createDB.sql
 %exclude %{rsyslog_docdir}/pgsql-createDB.sql
 %dir %{_libdir}/rsyslog
-%dir %{_sysconfdir}/rsyslog.d
-%dir %{rsyslog_statedir}
-%dir %{rsyslog_pkidir}
-%{_sbindir}/rsyslogd
-%{_bindir}/rsgtutil
-%{_mandir}/man5/rsyslog.conf.5.gz
-%{_mandir}/man8/rsyslogd.8.gz
-%{_mandir}/man1/rsgtutil.1.gz
-%{_unitdir}/rsyslog.service
-%config(noreplace) %{_sysconfdir}/rsyslog.conf
-%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
-%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
-# plugins
 %{_libdir}/rsyslog/imfile.so
 %{_libdir}/rsyslog/imklog.so
 %{_libdir}/rsyslog/immark.so
@@ -515,6 +528,17 @@ done
 %{_libdir}/rsyslog/pmaixforwardedfrom.so
 %{_libdir}/rsyslog/pmcisconames.so
 %{_libdir}/rsyslog/pmsnare.so
+%{_bindir}/rscryutil
+%config(noreplace) %{_sysconfdir}/rsyslog.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/rsyslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
+%dir %{_sysconfdir}/rsyslog.d
+%dir %{rsyslog_statedir}
+%dir %{rsyslog_pkidir}
+%{_sbindir}/rsyslogd
+%{_mandir}/man5/rsyslog.conf.5.gz
+%{_mandir}/man8/rsyslogd.8.gz
+%{_unitdir}/rsyslog.service
 
 %files libdbi
 %defattr(-,root,root)
@@ -585,6 +609,11 @@ done
 %defattr(-,root,root)
 %{_libdir}/rsyslog/ommail.so
 
+%files rsgtutil
+%defattr(-,root,root)
+%{_bindir}/rsgtutil
+%{_mandir}/man1/rsgtutil.1.gz
+
 %files elasticsearch
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omelasticsearch.so
@@ -599,6 +628,14 @@ done
 %files kafka
 %defattr(-,root,root)
 %{_libdir}/rsyslog/omkafka.so
+
+%files ksi
+%defattr(-,root,root)
+%{_libdir}/rsyslog/lmsig_ksi.so
+
+%files mmgrok
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmgrok.so
 
 %if %{want_hiredis}
 %files hiredis
@@ -630,8 +667,14 @@ done
 
 
 %changelog
-* Fri Mar 24 2016 Peter Portante <pportant@redhat.com> 8.14.0
-- rebase to 8.14.0
+* Thu Mar 24 2016 Peter Portante <pportant@redhat.com> 8.17.0
+- rebase to 8.17.0
+  - include mmgrok plugin
+  - include changes from upstream spec file
+    - Moved rsgtutil into own package
+    - KSI signature support has to be moved from
+      the base package to rsyslog-ksi
+    - Use of libfastjson by default
   - drop unused patches
   - add mmutf8fix packaging
   - bump liblognorm version requirement to 1.1.2
