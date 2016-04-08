@@ -8,15 +8,24 @@
 %global want_hiredis 1
 %global want_mongodb 0
 %endif
+%global use_real_source 0
+%if !%{use_real_source}
+%global branch v8-stable-mmkubernetes
+%global tarname 8-stable-mmkubernetes
+%endif
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
 Version: 8.17.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: (GPLv3+ and ASL 2.0)
 Group: System Environment/Daemons
 URL: http://www.rsyslog.com/
+%if %{use_real_source}
 Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
+%else
+Source0: https://github.com/theinric/rsyslog/archive/%{branch}.tar.gz
+%endif
 Source1: http://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{version}.tar.gz
 Source2: rsyslog.conf
 Source3: rsyslog.sysconfig
@@ -224,6 +233,17 @@ BuildRequires: libgcrypt-devel
 Summary: HTML documentation for rsyslog
 Group: Documentation
 
+%package omamqp1
+Summary: AMQP v1.0 support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+BuildRequires: qpid-proton-c-devel
+
+%package mmkubernetes
+Summary: Kubernetes metadata support
+Group: System Environment/Daemons
+Requires: %name = %version-%release
+
 %description
 Rsyslog is an enhanced, multi-threaded syslog daemon. It supports MySQL,
 syslog/TCP, RFC 3195, permitted sender lists, filtering on any message part,
@@ -359,13 +379,28 @@ command line tool to process encrypted logs.
 %description doc
 This subpackage contains documentation for rsyslog.
 
+%description omamqp1
+This module allows rsyslog to send messages to an AMQP v1.0 compliant message bus.
+
+%description mmkubernetes
+This module allows rsyslog to get additional metadata for Kubernetes log sources.
+
 %prep
 # set up rsyslog-doc sources
+%if %{use_real_source}
 %setup -q -a 1 -T -c
+%else
+%setup -q -a 1 -T -c -n %{name}-%{tarname}
+%endif
 rm -r LICENSE README.md build.sh source build/objects.inv
 mv build doc
 # set up rsyslog sources
+%if %{use_real_source}
 %setup -q -D
+%else
+%setup -q -D -n %{name}-%{tarname}
+ls -alrtF
+%endif
 %patch0 -p1
 
 autoreconf -vfi
@@ -437,7 +472,9 @@ export HIREDIS_LIBS="-L%{_libdir} -lhiredis"
         --enable-omrabbitmq \
         --enable-omstdout \
         --enable-pmcisconames \
-        --enable-pmsnare
+        --enable-pmsnare \
+        --enable-omamqp1 \
+        --enable-mmkubernetes
 
 make V=1
 
@@ -665,8 +702,20 @@ done
 %defattr(-,root,root)
 %doc %{rsyslog_docdir}/html
 
+%files omamqp1
+%defattr(-,root,root)
+%{_libdir}/rsyslog/omamqp1.so
+
+%files mmkubernetes
+%defattr(-,root,root)
+%{_libdir}/rsyslog/mmkubernetes.so
+
 
 %changelog
+* Thu Apr  7 2016 Rich Megginson <rmeggins@redhat.com> 8.17.0-2
+- added omamqp1 and mmkubernetes
+- build from https://github.com/theinric/rsyslog/archive/v8-stable-mmkubernetes.tar.gz
+
 * Thu Mar 24 2016 Peter Portante <pportant@redhat.com> 8.17.0
 - rebase to 8.17.0
   - include mmgrok plugin
